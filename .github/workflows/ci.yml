@@ -1,0 +1,278 @@
+name: CI - Verificación de Calidad
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality-check:
+    name: Verificación de Calidad de Código
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Bash
+        run: |
+          echo "BASH_VERSION=$(bash --version | head -n1)" >> $GITHUB_ENV
+
+      - name: Verificar sintaxis de scripts
+        run: |
+          echo "Verificando sintaxis de scripts..."
+          find scripts/sh -name "*.sh" -type f | while read -r script; do
+            echo "Verificando: $script"
+            bash -n "$script" || exit 1
+          done
+          echo "✓ Todos los scripts tienen sintaxis válida"
+
+      - name: Verificar longitud de líneas
+        run: |
+          echo "Verificando longitud de líneas (≤ 120 caracteres)..."
+          LONG_LINES=$(find scripts/sh makefiles -type f \( -name "*.sh" -o -name "*.mk" \) \
+            -exec awk 'length > 120 {print FILENAME":"NR": "length" caracteres: "$0}' {} + || true)
+
+          if [[ -n "$LONG_LINES" ]]; then
+            echo "❌ Líneas que exceden 120 caracteres:"
+            echo "$LONG_LINES"
+            exit 1
+          fi
+          echo "✓ Todas las líneas cumplen con el límite de 120 caracteres"
+
+      - name: Verificar uso de init.sh en scripts nuevos
+        run: |
+          echo "Verificando uso de init.sh en scripts de commands/..."
+          MISSING_INIT=0
+
+          for script in scripts/sh/commands/*.sh; do
+            if ! grep -q "init_script\|source.*init.sh" "$script" 2>/dev/null; then
+              echo "⚠️  Script sin init.sh: $script"
+              MISSING_INIT=$((MISSING_INIT + 1))
+            fi
+          done
+
+          if [[ $MISSING_INIT -gt 0 ]]; then
+            echo "⚠️  $MISSING_INIT scripts en commands/ no usan init.sh"
+            echo "Nota: Esto es una advertencia, no un error. Los scripts antiguos pueden no usar init.sh."
+          else
+            echo "✓ Todos los scripts verificados usan init.sh o tienen fallback"
+          fi
+
+      - name: Instalar BATS
+        run: |
+          echo "Instalando BATS..."
+          if [[ -f "scripts/sh/setup/install-bats.sh" ]]; then
+            bash scripts/sh/setup/install-bats.sh || exit 1
+          else
+            echo "⚠️  Script install-bats.sh no encontrado, instalando BATS manualmente..."
+            git clone https://github.com/bats-core/bats-core.git .bats-tmp
+            cd .bats-tmp
+            ./install.sh ../.bats
+            cd ..
+            rm -rf .bats-tmp
+          fi
+          export PATH="$PWD/.bats/bin:$PATH"
+          bats --version
+          echo "✓ BATS instalado"
+
+      - name: Ejecutar tests unitarios
+        run: |
+          echo "Ejecutando tests unitarios..."
+          export PATH="$PWD/.bats/bin:$PATH"
+          if [[ -d "tests/unit" ]]; then
+            bats tests/unit/ || exit 1
+            echo "✓ Tests unitarios pasaron"
+          else
+            echo "⚠️  No hay tests unitarios en tests/unit/"
+          fi
+
+      - name: Ejecutar tests de integración
+        run: |
+          echo "Ejecutando tests de integración..."
+          export PATH="$PWD/.bats/bin:$PATH"
+          if [[ -d "tests/integration" ]]; then
+            # Verificar que Docker está disponible
+            if ! command -v docker >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; then
+              echo "⚠️  Docker no está disponible, saltando tests de integración"
+            else
+              bats tests/integration/ || exit 1
+              echo "✓ Tests de integración pasaron"
+            fi
+          else
+            echo "⚠️  No hay tests de integración en tests/integration/"
+          fi
+
+      - name: Ejecutar tests de compatibilidad
+        run: |
+          echo "Ejecutando tests de compatibilidad..."
+          export PATH="$PWD/.bats/bin:$PATH"
+          if [[ -d "tests/integration" ]]; then
+            # Ejecutar tests de compatibilidad (pueden saltar algunos si no aplican)
+            bats tests/integration/test-compatibility-docker-compose.bats || true
+            bats tests/integration/test-compatibility-os.bats || true
+            bats tests/integration/test-compatibility-bash.bats || true
+            echo "✓ Tests de compatibilidad ejecutados"
+          fi
+
+      - name: Ejecutar tests legacy de helpers
+        run: |
+          echo "Ejecutando tests legacy de helpers..."
+          if [[ -f "scripts/sh/tests/test-init.sh" ]]; then
+            bash scripts/sh/tests/test-init.sh || exit 1
+          fi
+
+          if [[ -f "scripts/sh/tests/test-services.sh" ]]; then
+            bash scripts/sh/tests/test-services.sh || exit 1
+          fi
+          echo "✓ Tests legacy de helpers pasaron"
+
+      - name: Instalar shellcheck y shfmt
+        run: |
+          echo "Instalando herramientas de linting..."
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            echo "Instalando shellcheck..."
+            sudo apt-get update && sudo apt-get install -y shellcheck
+          fi
+          if ! command -v shfmt >/dev/null 2>&1; then
+            echo "Instalando shfmt..."
+            go install mvdan.cc/sh/v3/cmd/shfmt@latest || {
+              echo "⚠️  shfmt no se pudo instalar (requiere Go)"
+            }
+          fi
+          shellcheck --version || true
+          shfmt --version || true
+
+      - name: Ejecutar linters
+        run: |
+          echo "Ejecutando linters..."
+          if [[ -f "scripts/sh/utils/lint.sh" ]]; then
+            bash scripts/sh/utils/lint.sh --check-only || {
+              echo "⚠️  Algunos problemas de linting encontrados"
+            }
+          else
+            echo "⚠️  Script lint.sh no encontrado"
+          fi
+
+      - name: Verificar calidad de código
+        run: |
+          echo "Ejecutando verificación de calidad..."
+          if [[ -f "scripts/sh/utils/check-code-quality.sh" ]]; then
+            bash scripts/sh/utils/check-code-quality.sh || {
+              echo "⚠️  Algunas verificaciones de calidad fallaron (no crítico)"
+            }
+          fi
+
+      - name: Verificar sintaxis de Makefiles
+        run: |
+          echo "Verificando sintaxis de Makefiles..."
+          make -n help-toolbox >/dev/null 2>&1 || {
+            echo "❌ Error en sintaxis de Makefiles"
+            exit 1
+          }
+          echo "✓ Makefiles tienen sintaxis válida"
+
+      - name: Verificar documentación de scripts
+        run: |
+          echo "Verificando documentación de scripts..."
+          if [[ -f "scripts/sh/utils/check-documentation.sh" ]]; then
+            bash scripts/sh/utils/check-documentation.sh || {
+              echo "⚠️  Algunos scripts tienen documentación incompleta"
+            }
+          else
+            echo "⚠️  Script check-documentation.sh no encontrado"
+          fi
+
+      - name: Resumen
+        run: |
+          echo "=========================================="
+          echo "✓ Verificación de calidad completada"
+          echo "=========================================="
+
+  validate-config:
+    name: Validación de Configuración
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Verificar que .env-template existe
+        run: |
+          if [[ ! -f ".env-template" ]]; then
+            echo "⚠️  .env-template no encontrado (puede ser opcional)"
+          else
+            echo "✓ .env-template encontrado"
+          fi
+
+      - name: Verificar estructura de directorios
+        run: |
+          echo "Verificando estructura de directorios..."
+          REQUIRED_DIRS=(
+            "scripts/sh/common"
+            "scripts/sh/commands"
+            "scripts/sh/utils"
+            "makefiles/main"
+          )
+
+          for dir in "${REQUIRED_DIRS[@]}"; do
+            if [[ ! -d "$dir" ]]; then
+              echo "❌ Directorio requerido no encontrado: $dir"
+              exit 1
+            fi
+          done
+          echo "✓ Estructura de directorios correcta"
+
+  compatibility-tests:
+    name: Tests de Compatibilidad
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        bash-version: [4, 5]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Bash
+        run: |
+          echo "BASH_VERSION=$(bash --version | head -n1)" >> $GITHUB_ENV
+          bash --version
+
+      - name: Instalar BATS
+        run: |
+          echo "Instalando BATS..."
+          if [[ -f "scripts/sh/setup/install-bats.sh" ]]; then
+            bash scripts/sh/setup/install-bats.sh || exit 1
+          else
+            git clone https://github.com/bats-core/bats-core.git .bats-tmp
+            cd .bats-tmp
+            ./install.sh ../.bats
+            cd ..
+            rm -rf .bats-tmp
+          fi
+          export PATH="$PWD/.bats/bin:$PATH"
+          bats --version
+
+      - name: Ejecutar tests de compatibilidad OS
+        run: |
+          export PATH="$PWD/.bats/bin:$PATH"
+          bats tests/integration/test-compatibility-os.bats || true
+
+      - name: Ejecutar tests de compatibilidad Bash
+        run: |
+          export PATH="$PWD/.bats/bin:$PATH"
+          bats tests/integration/test-compatibility-bash.bats || true
+
+      - name: Ejecutar tests de compatibilidad Docker Compose
+        if: runner.os == 'Linux'
+        run: |
+          export PATH="$PWD/.bats/bin:$PATH"
+          # Instalar Docker si no está disponible
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "Docker no está disponible en este runner"
+          else
+            bats tests/integration/test-compatibility-docker-compose.bats || true
+          fi

@@ -1,0 +1,100 @@
+{
+  "version_schema": "1.0",
+  "last_updated": "2025-01-27",
+  "requirements": {
+    "required": {
+      "docker": {
+        "min_version": "20.10.0",
+        "recommended_version": "24.0.0",
+        "check_command": "docker --version",
+        "version_pattern": "\\d+\\.\\d+(?:\\.\\d+)?",
+        "install_url": "https://docs.docker.com/get-docker/",
+        "description": "Docker Engine o Docker Desktop"
+      },
+      "docker-compose": {
+        "min_version": "2.0.0",
+        "alternative": "docker-compose",
+        "alternative_min_version": "1.29.0",
+        "check_command": "docker compose version || docker-compose --version",
+        "version_pattern": "\\d+\\.\\d+(?:\\.\\d+)?",
+        "install_url": "https://docs.docker.com/compose/install/",
+        "description": "Docker Compose V2 (preferido) o V1"
+      },
+      "bash": {
+        "min_version": "4.0.0",
+        "check_command": "bash --version",
+        "version_pattern": "version (\\d+\\.\\d+)",
+        "description": "Bash shell (incluido en Linux/macOS)"
+      },
+      "make": {
+        "min_version": "4.0.0",
+        "check_command": "make --version",
+        "version_pattern": "GNU Make (\\d+\\.\\d+)",
+        "install_url": "https://www.gnu.org/software/make/",
+        "description": "GNU Make"
+      }
+    },
+    "optional": {
+      "jq": {
+        "min_version": "1.6.0",
+        "check_command": "jq --version",
+        "version_pattern": "jq-(\\d+\\.\\d+(?:\\.\\d+)?)",
+        "install_url": {
+          "linux": "https://stedolan.github.io/jq/download/",
+          "macos": "brew install jq",
+          "description": "jq para procesamiento JSON. Requerido para algunas funcionalidades avanzadas"
+        },
+        "fallback": true,
+        "fallback_message": "Algunas funcionalidades avanzadas no estarán disponibles sin jq"
+      },
+      "curl": {
+        "min_version": "7.0.0",
+        "check_command": "curl --version",
+        "version_pattern": "curl (\\d+\\.\\d+(?:\\.\\d+)?)",
+        "install_url": {
+          "linux": "sudo apt install curl",
+          "macos": "brew install curl",
+          "description": "curl para descargas HTTP. Usado para algunas operaciones de red"
+        },
+        "fallback": true,
+        "fallback_message": "Algunas operaciones de red pueden no funcionar sin curl"
+      },
+      "awk": {
+        "min_version": "4.0.0",
+        "check_command": "awk --version || awk 'BEGIN {print \"4.0.0\"}'",
+        "version_pattern": "GNU Awk (\\d+\\.\\d+(?:\\.\\d+)?)",
+        "description": "AWK para procesamiento de texto. Generalmente incluido en sistemas Unix"
+      },
+      "grep": {
+        "min_version": "2.0.0",
+        "check_command": "grep --version",
+        "version_pattern": "grep \\(GNU grep\\) (\\d+\\.\\d+(?:\\.\\d+)?)",
+        "description": "grep para búsqueda de texto. Generalmente incluido en sistemas Unix"
+      }
+    },
+    "external": {
+      "infisical": {
+        "optional": true,
+        "check_command": "infisical --version || command -v infisical",
+        "description": "Infisical CLI para gestión de secretos. Opcional, con fallback a .env",
+        "fallback": true,
+        "fallback_message": "Sin Infisical, se usarán variables de entorno desde .env"
+      }
+    }
+  },
+  "os_specific": {
+    "linux": {
+      "package_manager": {
+        "apt": "sudo apt update && sudo apt install -y",
+        "yum": "sudo yum install -y",
+        "dnf": "sudo dnf install -y",
+        "pacman": "sudo pacman -S --noconfirm"
+      }
+    },
+    "macos": {
+      "package_manager": {
+        "brew": "brew install"
+      }
+    }
+  }
+}

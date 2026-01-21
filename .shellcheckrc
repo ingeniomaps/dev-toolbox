@@ -1,0 +1,34 @@
+# ShellCheck Configuration
+# ============================================================================
+# Configuración de ShellCheck para el proyecto dev-toolbox
+# ============================================================================
+
+# Excluir warnings específicos que son aceptables en este proyecto
+# SC1090: Can't follow non-constant source. Use a directive to specify location.
+#         (Aceptable porque cargamos scripts dinámicamente)
+# SC1091: Not following: file was not specified as input
+#         (Aceptable porque algunos scripts se cargan condicionalmente)
+# SC2034: Variable appears unused
+#         (Algunas variables se usan en otros scripts o contextos)
+# SC2155: Declare and assign separately to avoid masking return values
+#         (Aceptable en algunos casos donde la asignación es segura)
+
+# Warnings a excluir (comentados para mantener visibilidad)
+# exclude=SC1090,SC1091,SC2034,SC2155
+
+# Shell a usar (bash)
+shell=bash
+
+# Fuentes adicionales a verificar
+# source-path=scripts/sh
+
+# Formato de salida
+format=gcc
+
+# Nivel de severidad mínimo (error, warning, info, style)
+severity=warning
+
+# Opciones adicionales
+# -e: Excluir códigos específicos
+# -x: Seguir fuentes externas
+# -f: Formato de salida

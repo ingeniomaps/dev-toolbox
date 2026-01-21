@@ -1,0 +1,21 @@
+# Configuración de Logging para dev-toolbox
+# Copia este archivo a .logging-config y personaliza según necesites
+#
+# Uso:
+#   cp .logging-config.example .logging-config
+#   # Edita .logging-config con tus valores
+
+# Directorio base para logs (relativo a PROJECT_ROOT o absoluto)
+LOG_DIR=logs
+
+# Tamaño máximo de archivo de log en MB antes de rotar
+LOG_MAX_SIZE=10
+
+# Días de retención de logs antiguos
+LOG_RETENTION_DAYS=30
+
+# Número máximo de archivos rotados a mantener
+LOG_MAX_FILES=5
+
+# Comprimir logs rotados (true/false)
+LOG_COMPRESS=false
