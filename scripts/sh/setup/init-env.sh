@@ -48,7 +48,7 @@ fi
 # VARIABLES Y CONFIGURACIÓN
 # ============================================================================
 
-NAME="${1:-}"
+NAME=""
 FORCE=false
 SILENT=false
 
