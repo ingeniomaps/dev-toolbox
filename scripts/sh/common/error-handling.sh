@@ -184,10 +184,11 @@ retry_command() {
 #   $1 - Función de rollback a ejecutar
 #   $2 - Mensaje de rollback (opcional)
 rollback_on_error() {
+	local last_exit=$?
 	local rollback_func="$1"
 	local rollback_msg="${2:-Ejecutando rollback...}"
 
-	if [[ $? -ne 0 ]]; then
+	if [[ $last_exit -ne 0 ]]; then
 		log_warn "$rollback_msg"
 		if command -v "$rollback_func" >/dev/null 2>&1; then
 			"$rollback_func" || true

@@ -105,10 +105,13 @@ for service in $SERVICES_LIST; do
 	if [[ -f "$SERVICE_DIR/docker-compose.yml" ]]; then
 		log_info "Construyendo imágenes de $service..."
 		# Construir argumentos de build de forma segura
-		BUILD_ARGS_SAFE="${BUILD_ARGS:-}"
+		BUILD_ARGS_ARR=()
+		if [[ -n "${BUILD_ARGS:-}" ]]; then
+			read -ra BUILD_ARGS_ARR <<< "${BUILD_ARGS}"
+		fi
 		if command -v retry_command >/dev/null 2>&1; then
-			if [[ -n "$BUILD_ARGS_SAFE" ]]; then
-				if ! retry_command 2 bash -c "cd '$SERVICE_DIR' && $DOCKER_COMPOSE_CMD build $BUILD_ARGS_SAFE"; then
+			if [[ ${#BUILD_ARGS_ARR[@]} -gt 0 ]]; then
+				if ! retry_command 2 bash -c "cd '$SERVICE_DIR' && $DOCKER_COMPOSE_CMD build ${BUILD_ARGS_ARR[*]}"; then
 					log_error "Falló al construir $service después de 2 intentos"
 					EXIT_CODE=1
 				else
@@ -123,8 +126,8 @@ for service in $SERVICES_LIST; do
 				fi
 			fi
 		else
-			if [[ -n "$BUILD_ARGS_SAFE" ]]; then
-				if ! (cd "$SERVICE_DIR" && $DOCKER_COMPOSE_CMD build $BUILD_ARGS_SAFE); then
+			if [[ ${#BUILD_ARGS_ARR[@]} -gt 0 ]]; then
+				if ! (cd "$SERVICE_DIR" && $DOCKER_COMPOSE_CMD build "${BUILD_ARGS_ARR[@]}"); then
 					log_error "Falló al construir $service"
 					EXIT_CODE=1
 				else
@@ -147,10 +150,13 @@ for service in $SERVICES_LIST; do
 
 		if [[ -f "$DOCKERFILE" ]]; then
 			# Construir argumentos de build de forma segura
-			BUILD_ARGS_SAFE="${BUILD_ARGS:-}"
+			BUILD_ARGS_ARR=()
+			if [[ -n "${BUILD_ARGS:-}" ]]; then
+				read -ra BUILD_ARGS_ARR <<< "${BUILD_ARGS}"
+			fi
 			if command -v retry_command >/dev/null 2>&1; then
-				if [[ -n "$BUILD_ARGS_SAFE" ]]; then
-					if ! retry_command 2 docker build $BUILD_ARGS_SAFE -t "$service:latest" \
+				if [[ ${#BUILD_ARGS_ARR[@]} -gt 0 ]]; then
+					if ! retry_command 2 docker build "${BUILD_ARGS_ARR[@]}" -t "$service:latest" \
 						-f "$DOCKERFILE" "$SERVICE_DIR"; then
 						log_error "Falló al construir $service después de 2 intentos"
 						EXIT_CODE=1
@@ -167,8 +173,8 @@ for service in $SERVICES_LIST; do
 					fi
 				fi
 			else
-				if [[ -n "$BUILD_ARGS_SAFE" ]]; then
-					if ! docker build $BUILD_ARGS_SAFE -t "$service:latest" \
+				if [[ ${#BUILD_ARGS_ARR[@]} -gt 0 ]]; then
+					if ! docker build "${BUILD_ARGS_ARR[@]}" -t "$service:latest" \
 						-f "$DOCKERFILE" "$SERVICE_DIR"; then
 						log_error "Falló al construir $service"
 						EXIT_CODE=1

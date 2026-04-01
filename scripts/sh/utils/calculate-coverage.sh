@@ -31,7 +31,14 @@ IFS=$'\n\t'
 _script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_DIR="$_script_dir"
 unset _script_dir
-readonly PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/../../.." 2>/dev/null && pwd || pwd)}"
+if [[ -z "${PROJECT_ROOT:-}" ]]; then
+	if cd "$SCRIPT_DIR/../../.." 2>/dev/null; then
+		PROJECT_ROOT="$(pwd)"
+	else
+		PROJECT_ROOT="$(pwd)"
+	fi
+fi
+readonly PROJECT_ROOT
 
 # Cargar módulos de cobertura
 source "$SCRIPT_DIR/coverage-finder.sh"

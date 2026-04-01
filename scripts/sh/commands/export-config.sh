@@ -147,7 +147,7 @@ else
 			VAR_VALUE=$(echo "$var_line" | cut -d'=' -f2-)
 
 			# Escapar valores YAML
-			VAR_VALUE_ESC=$(echo "$VAR_VALUE" | sed "s/:/\\:/g")
+			VAR_VALUE_ESC="${VAR_VALUE//:/\\:}"
 			echo "  $VAR_NAME: \"$VAR_VALUE_ESC\""
 		done <<< "$CONFIG_VARS"
 	} > "$OUTPUT_FILE"

@@ -102,7 +102,7 @@ for backup in "${BACKUPS_FOUND[@]}"; do
 	backup_size=$(du -sh "$backup" 2>/dev/null | cut -f1 || echo "?")
 	echo "  [$INDEX] $backup_name"
 	echo "       Fecha: $backup_date | Tamaño: $backup_size"
-	BACKUP_OPTIONS[$INDEX]="$backup"
+	BACKUP_OPTIONS[INDEX]="$backup"
 	INDEX=$((INDEX + 1))
 done
 
@@ -121,7 +121,7 @@ if ! [[ "$SELECTION" =~ ^[0-9]+$ ]] || \
 	exit 1
 fi
 
-SELECTED_BACKUP="${BACKUP_OPTIONS[$SELECTION]}"
+SELECTED_BACKUP="${BACKUP_OPTIONS[SELECTION]}"
 
 log_warn "ADVERTENCIA: Esto restaurará el backup seleccionado"
 log_warn "Los datos actuales pueden ser sobrescritos"

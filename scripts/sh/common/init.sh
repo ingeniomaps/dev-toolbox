@@ -98,7 +98,7 @@ get_project_root() {
 	if [[ -n "${PROJECT_ROOT:-}" ]]; then
 		echo "${PROJECT_ROOT%/}"
 	else
-		echo "$(pwd)"
+		pwd
 	fi
 }
 

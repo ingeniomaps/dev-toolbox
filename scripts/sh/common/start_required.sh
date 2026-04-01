@@ -85,15 +85,16 @@ start_required_repositories() {
 	for repo_name in "${repositories[@]}"; do
 		# Expandir patrones con el nombre del repositorio
 		local repo_url
-		repo_url=$(echo "$repo_url_pattern" | sed "s/\${repo_name}/$repo_name/g" | \
-			sed "s/\${git_user}/$git_user/g" | sed "s/\${git_token}/$git_token/g")
+		repo_url="${repo_url_pattern//\$\{repo_name\}/$repo_name}"
+		repo_url="${repo_url//\$\{git_user\}/$git_user}"
+		repo_url="${repo_url//\$\{git_token\}/$git_token}"
 		local target
-		target=$(echo "$repo_folder_pattern" | sed "s/\${repo_name}/$repo_name/g")
+		target="${repo_folder_pattern//\$\{repo_name\}/$repo_name}"
 
 		if [[ ! -d "$target" ]]; then
 			if [[ -z $(docker ps -q -f "name=$slug$repo_name") ]]; then
 				git clone --depth=1 --branch "$branch" "$repo_url" "$target"
-				make up-$repo_name
+				make "up-$repo_name"
 			fi
 		else
 			before=$(git -C "$target" rev-parse HEAD 2>/dev/null || echo "")
@@ -101,8 +102,8 @@ start_required_repositories() {
 			after=$(git -C "$target" rev-parse HEAD 2>/dev/null || echo "")
 
 			if [[ -n "$before" ]] && [[ -n "$after" ]] && [[ "$before" != "$after" ]]; then
-				make down-$repo_name 2>/dev/null || true
-				make up-$repo_name
+				make "down-$repo_name" 2>/dev/null || true
+				make "up-$repo_name"
 			fi
 		fi
 	done

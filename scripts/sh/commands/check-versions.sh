@@ -56,7 +56,7 @@ if command -v docker >/dev/null 2>&1; then
 	DOCKER_MINOR=$(echo "$DOCKER_VERSION" | cut -d. -f2)
 
 	if [[ $DOCKER_MAJOR -gt 20 ]] || \
-		([[ $DOCKER_MAJOR -eq 20 ]] && [[ $DOCKER_MINOR -ge 10 ]]); then
+		{ [[ $DOCKER_MAJOR -eq 20 ]] && [[ $DOCKER_MINOR -ge 10 ]]; }; then
 		log_success "Docker $DOCKER_VERSION >= 20.10"
 	else
 		log_warn "Docker $DOCKER_VERSION < 20.10 (recomendado: >= 20.10)"

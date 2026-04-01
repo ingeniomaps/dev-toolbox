@@ -33,7 +33,11 @@ readonly COMMON_SCRIPTS_DIR="$SCRIPT_DIR/../common"
 
 # Determinar PROJECT_ROOT antes de cargar init.sh (que puede establecerlo como readonly)
 if [[ -z "${PROJECT_ROOT:-}" ]]; then
-	PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." 2>/dev/null && pwd || pwd)"
+	if cd "$SCRIPT_DIR/../../.." 2>/dev/null; then
+		PROJECT_ROOT="$(pwd)"
+	else
+		PROJECT_ROOT="$(pwd)"
+	fi
 fi
 
 # Cargar helpers comunes
@@ -41,14 +45,22 @@ if [[ -f "$COMMON_SCRIPTS_DIR/init.sh" ]]; then
 	source "$COMMON_SCRIPTS_DIR/init.sh"
 	# init_script puede establecer PROJECT_ROOT como readonly, así que lo hacemos después
 	if [[ -z "${PROJECT_ROOT:-}" ]]; then
-		PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." 2>/dev/null && pwd || pwd)"
+		if cd "$SCRIPT_DIR/../../.." 2>/dev/null; then
+			PROJECT_ROOT="$(pwd)"
+		else
+			PROJECT_ROOT="$(pwd)"
+		fi
 	fi
 else
 	if [[ -f "$COMMON_SCRIPTS_DIR/logging.sh" ]]; then
 		source "$COMMON_SCRIPTS_DIR/logging.sh"
 	fi
 	if [[ -z "${PROJECT_ROOT:-}" ]]; then
-		PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." 2>/dev/null && pwd || pwd)"
+		if cd "$SCRIPT_DIR/../../.." 2>/dev/null; then
+			PROJECT_ROOT="$(pwd)"
+		else
+			PROJECT_ROOT="$(pwd)"
+		fi
 	fi
 fi
 

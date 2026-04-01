@@ -76,7 +76,7 @@ find_test_for_script() {
 	# Buscar variaciones comunes
 	local variations=(
 		"test-${script_name}.bats"
-		"test-$(echo "$script_name" | sed 's/-/_/g').bats"
+		"test-${script_name//-/_}.bats"
 		"test-$(echo "$script_name" | tr '-' '_').bats"
 	)
 

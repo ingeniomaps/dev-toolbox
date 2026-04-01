@@ -48,7 +48,7 @@ output_text() {
 		if [[ ${#untested_scripts_ref[@]} -gt 0 ]]; then
 			echo "📝 Scripts sin tests (${#untested_scripts_ref[@]}):"
 			for script in "${untested_scripts_ref[@]}"; do
-				local rel_path="${script#$project_root/}"
+				local rel_path="${script#"$project_root"/}"
 				echo "  - $rel_path"
 			done
 			echo ""
@@ -58,7 +58,7 @@ output_text() {
 			echo "✅ Scripts con tests (${#tested_scripts_ref[@]}):"
 			local count=0
 			for script in "${tested_scripts_ref[@]}"; do
-				local rel_path="${script#$project_root/}"
+				local rel_path="${script#"$project_root"/}"
 				local test_file="${script_to_test_ref[$script]}"
 				local test_count
 				test_count=$(count_tests_in_file "$test_file")
@@ -103,7 +103,7 @@ output_json() {
 		echo "    \"untested_scripts\": $untested,"
 		echo "    \"coverage_percent\": $coverage,"
 		echo "    \"min_required\": $min_coverage,"
-		echo "    \"meets_requirement\": $([ $coverage -ge $min_coverage ] && echo "true" || echo "false")"
+		echo "    \"meets_requirement\": $([ "$coverage" -ge "$min_coverage" ] && echo "true" || echo "false")"
 		echo "  },"
 		echo "  \"tested_scripts\": ["
 
@@ -114,13 +114,13 @@ output_json() {
 			else
 				echo ","
 			fi
-			local rel_path="${script#$project_root/}"
+			local rel_path="${script#"$project_root"/}"
 			local test_file="${script_to_test_ref[$script]}"
 			local test_count
 			test_count=$(count_tests_in_file "$test_file")
 			echo -n "    {"
 			echo -n "\"script\": \"$rel_path\","
-			echo -n "\"test_file\": \"${test_file#$project_root/}\","
+			echo -n "\"test_file\": \"${test_file#"$project_root"/}\","
 			echo -n "\"test_count\": $test_count"
 			echo -n "}"
 		done
@@ -136,7 +136,7 @@ output_json() {
 			else
 				echo ","
 			fi
-			local rel_path="${script#$project_root/}"
+			local rel_path="${script#"$project_root"/}"
 			echo -n "    \"$rel_path\""
 		done
 
@@ -165,10 +165,10 @@ output_html() {
 	local -n tested_scripts_ref=$tested_scripts_var
 	local -n script_to_test_ref=$script_to_test_var
 
-	_status_class=$([ $coverage -ge $min_coverage ] && echo "success" || echo "error")
+	_status_class=$([ "$coverage" -ge "$min_coverage" ] && echo "success" || echo "error")
 	local status_class="$_status_class"
 	unset _status_class
-	_status_icon=$([ $coverage -ge $min_coverage ] && echo "✅" || echo "❌")
+	_status_icon=$([ "$coverage" -ge "$min_coverage" ] && echo "✅" || echo "❌")
 	local status_icon="$_status_icon"
 	unset _status_icon
 
@@ -282,7 +282,7 @@ output_html() {
 EOF
 
 		for script in "${untested_scripts_ref[@]}"; do
-			local rel_path="${script#$project_root/}"
+			local rel_path="${script#"$project_root"/}"
 			echo "                <tr><td class=\"untested\">$rel_path</td></tr>"
 		done
 
@@ -303,9 +303,9 @@ EOF
 EOF
 
 		for script in "${tested_scripts_ref[@]}"; do
-			local rel_path="${script#$project_root/}"
+			local rel_path="${script#"$project_root"/}"
 			local test_file="${script_to_test_ref[$script]}"
-			local test_file_rel="${test_file#$project_root/}"
+			local test_file_rel="${test_file#"$project_root"/}"
 			local test_count
 			test_count=$(count_tests_in_file "$test_file")
 			echo "                <tr>"

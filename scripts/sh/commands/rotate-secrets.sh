@@ -77,6 +77,10 @@ log_step "Rotando secretos..."
 SECRET_PATTERNS="PASSWORD|SECRET|TOKEN|KEY|PRIVATE|CREDENTIAL"
 ROTATED_COUNT=0
 
+# Leer una copia del archivo para evitar leer y escribir el mismo archivo
+# en el mismo pipeline (SC2094)
+ENV_FILE_SNAPSHOT=$(cat "$ENV_FILE")
+
 while IFS='=' read -r line; do
 	# Saltar comentarios y líneas vacías
 	[[ "$line" =~ ^[[:space:]]*# ]] && continue
@@ -132,7 +136,7 @@ while IFS='=' read -r line; do
 			fi
 		fi
 	fi
-done < "$ENV_FILE"
+done <<< "$ENV_FILE_SNAPSHOT"
 
 if [[ $ROTATED_COUNT -gt 0 ]]; then
 	log_success "Rotación completada: $ROTATED_COUNT secretos rotados"

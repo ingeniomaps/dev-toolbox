@@ -110,6 +110,10 @@ days_until_expiry() {
 
 SECRET_PATTERNS="PASSWORD|SECRET|TOKEN|KEY|PRIVATE|CREDENTIAL"
 
+# Leer el archivo .env en una copia temporal para evitar leer y buscar en el mismo archivo
+# dentro del pipeline (SC2094)
+ENV_FILE_COPY=$(cat "$ENV_FILE")
+
 while IFS='=' read -r line; do
 	# Saltar comentarios y líneas vacías
 	[[ "$line" =~ ^[[:space:]]*# ]] && continue
@@ -129,9 +133,9 @@ while IFS='=' read -r line; do
 	# Buscar variable de expiración relacionada
 	for expiry_pattern in "_EXPIRES=" "_EXPIRY=" "_ROTATE_BEFORE="; do
 		EXPIRY_VAR="${VAR_NAME}${expiry_pattern}"
-		if grep -q "^${EXPIRY_VAR}" "$ENV_FILE" 2>/dev/null; then
+		if echo "$ENV_FILE_COPY" | grep -q "^${EXPIRY_VAR}" 2>/dev/null; then
 			EXPIRY_DATE=$(
-				grep "^${EXPIRY_VAR}" "$ENV_FILE" 2>/dev/null |
+				echo "$ENV_FILE_COPY" | grep "^${EXPIRY_VAR}" 2>/dev/null |
 					cut -d'=' -f2 | tr -d '"' | tr -d "'" | tr -d '[:space:]'
 			)
 			break
@@ -140,10 +144,10 @@ while IFS='=' read -r line; do
 
 	# Si no se encontró, buscar en comentarios anteriores
 	if [[ -z "$EXPIRY_DATE" ]]; then
-		VAR_LINE=$(grep -n "^${VAR_NAME}=" "$ENV_FILE" 2>/dev/null | head -1 | cut -d':' -f1)
+		VAR_LINE=$(echo "$ENV_FILE_COPY" | grep -n "^${VAR_NAME}=" 2>/dev/null | head -1 | cut -d':' -f1)
 		if [[ -n "$VAR_LINE" ]] && [[ $VAR_LINE -gt 1 ]]; then
 			PREV_LINE=$((VAR_LINE - 1))
-			PREV_CONTENT=$(sed -n "${PREV_LINE}p" "$ENV_FILE" 2>/dev/null || echo "")
+			PREV_CONTENT=$(echo "$ENV_FILE_COPY" | sed -n "${PREV_LINE}p" 2>/dev/null || echo "")
 
 			if echo "$PREV_CONTENT" | grep -qiE "EXPIRES|EXPIRY|ROTATE_BEFORE"; then
 				EXPIRY_DATE=$(echo "$PREV_CONTENT" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1)
@@ -173,7 +177,7 @@ while IFS='=' read -r line; do
 			fi
 		fi
 	fi
-done < "$ENV_FILE"
+done <<< "$ENV_FILE_COPY"
 
 # Mostrar resultados
 if [[ ${#EXPIRED_SECRETS[@]} -gt 0 ]]; then

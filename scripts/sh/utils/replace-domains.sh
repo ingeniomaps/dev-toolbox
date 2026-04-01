@@ -127,8 +127,8 @@ fi
 #   Esto es útil para configuraciones DNS donde se necesita el formato invertido.
 #
 # Extraer los últimos dos segmentos del dominio y crear DNS invertido
-OLD_DNS=$(join . ${DOMAIN_CURRENT//./ } | awk '{print $(NF-1)"."$NF}' 2>/dev/null || echo "")
-NEW_DNS=$(join . ${DOMAIN_NEW//./ } | awk '{print $(NF-1)"."$NF}' 2>/dev/null || echo "")
+OLD_DNS=$(join . "${DOMAIN_CURRENT//./ }" | awk '{print $(NF-1)"."$NF}' 2>/dev/null || echo "")
+NEW_DNS=$(join . "${DOMAIN_NEW//./ }" | awk '{print $(NF-1)"."$NF}' 2>/dev/null || echo "")
 
 if [[ -n "$OLD_DNS" ]] && [[ -n "$NEW_DNS" ]] && [[ "$OLD_DNS" != "$NEW_DNS" ]]; then
 	if grep -rl "$OLD_DNS" "$PROJECT_ROOT" \

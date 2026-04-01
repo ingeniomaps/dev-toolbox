@@ -118,7 +118,7 @@ if [[ -z "$SERVICES_LIST" ]]; then
 fi
 
 # Filtrar servicios existentes y construir filtros para docker ps
-FILTER_ARGS=""
+FILTER_ARGS=()
 VALID_SERVICES=()
 EXIT_CODE=0
 MISSING_COUNT=0
@@ -138,7 +138,7 @@ for service in $SERVICES_LIST; do
 
 	# Verificar si el contenedor existe (corriendo o detenido)
 	if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q "^${CONTAINER_NAME}$"; then
-		FILTER_ARGS="$FILTER_ARGS --filter name=$CONTAINER_NAME"
+		FILTER_ARGS+=(--filter "name=$CONTAINER_NAME")
 		VALID_SERVICES+=("$service")
 		FOUND_COUNT=$((FOUND_COUNT + 1))
 	else
@@ -168,7 +168,7 @@ if [[ $FOUND_COUNT -eq 0 ]]; then
 fi
 
 # Obtener contenedores corriendo
-RUNNING_CONTAINERS=$(docker ps $FILTER_ARGS --format "{{.Names}}" 2>/dev/null | head -10 || echo "")
+RUNNING_CONTAINERS=$(docker ps "${FILTER_ARGS[@]}" --format "{{.Names}}" 2>/dev/null | head -10 || echo "")
 
 if [[ -z "$RUNNING_CONTAINERS" ]]; then
 	log_warn "No hay servicios corriendo"
@@ -182,7 +182,7 @@ fi
 
 log_info "Uso de Recursos (CPU y Memoria):"
 # Obtener nombres de contenedores en un array para evitar word splitting
-mapfile -t container_names < <(docker ps $FILTER_ARGS --format "{{.Names}}" 2>/dev/null || true)
+mapfile -t container_names < <(docker ps "${FILTER_ARGS[@]}" --format "{{.Names}}" 2>/dev/null || true)
 if ! docker stats --no-stream \
 	--format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}" \
 	"${container_names[@]}" \
@@ -196,7 +196,7 @@ echo ""
 log_info "Estado de Salud:"
 HEALTHY_COUNT=0
 UNHEALTHY_COUNT=0
-for container in $(docker ps $FILTER_ARGS --format "{{.Names}}" 2>/dev/null); do
+for container in $(docker ps "${FILTER_ARGS[@]}" --format "{{.Names}}" 2>/dev/null); do
 	HEALTH=$(docker inspect --format='{{.State.Health.Status}}' "$container" 2>/dev/null || echo "no_healthcheck")
 	STATUS=$(docker inspect --format='{{.State.Status}}' "$container" 2>/dev/null)
 

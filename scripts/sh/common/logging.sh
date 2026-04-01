@@ -348,7 +348,8 @@ usage() {
 
 	if [[ -n "$examples" ]]; then
 		log_info "Ejemplos:"
-		echo "$examples" | sed 's/^/  /' >&2
+		local indented="  ${examples//$'\n'/$'\n'  }"
+		echo "$indented" >&2
 	fi
 }
 

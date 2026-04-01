@@ -26,7 +26,7 @@ parse_version() {
 	local version="$1"
 
 	# Remover sufijos comunes (-alpine, -slim, etc.)
-	version=$(echo "$version" | sed 's/-[a-z].*//')
+	version="${version%%-[a-z]*}"
 
 	# Extraer números de versión (ej: "16.1" -> "16.1.0", "8.0.0" -> "8.0.0")
 	local parts
@@ -54,7 +54,7 @@ compare_versions() {
 # Función: Obtener versión mayor (X.Y)
 get_major_minor() {
 	local version="$1"
-	version=$(echo "$version" | sed 's/-[a-z].*//')
+	version="${version%%-[a-z]*}"
 	local parts
 	IFS='.' read -ra parts <<< "$version"
 	local major="${parts[0]:-0}"
@@ -65,8 +65,8 @@ get_major_minor() {
 # Función: Obtener versión mayor solo (X)
 get_major() {
 	local version="$1"
-	version=$(echo "$version" | sed 's/-[a-z].*//')
-	echo "$version" | cut -d'.' -f1
+	version="${version%%-[a-z]*}"
+	echo "${version%%.*}"
 }
 
 # Función: Verificar si jq está disponible

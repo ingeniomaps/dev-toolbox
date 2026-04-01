@@ -86,7 +86,7 @@ ensure_docker_network() {
 	local expected_subnet="${networkNet}.0.0/16"
 
 	# Verificar si la red ya existe
-	if docker network ls -q -f name=^${networkName}$ | grep -q .; then
+	if docker network ls -q -f "name=^${networkName}$" | grep -q .; then
 		log_info "La red $networkName ya existe"
 
 		# Validar configuración de la red existente
@@ -236,14 +236,14 @@ ensure_docker_network() {
 
 	# Intentar crear la red solo si no hay conflictos
 	local create_output
-	create_output=$(docker network create --driver=bridge --subnet=${subnet} \
+	create_output=$(docker network create --driver=bridge --subnet="${subnet}" \
 		"$networkName" 2>&1)
 	local create_exit=$?
 
 	if [[ $create_exit -eq 0 ]]; then
 		log_success "Red $networkName creada exitosamente (subnet: $subnet)"
 		# Verificar que la red realmente se creó
-		if ! docker network ls -q -f name=^${networkName}$ | grep -q .; then
+		if ! docker network ls -q -f "name=^${networkName}$" | grep -q .; then
 			log_error "La red $networkName no se creó correctamente"
 			log_info "💡 Sugerencia: Verifica los logs de Docker para más detalles"
 			return 1

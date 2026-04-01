@@ -95,7 +95,7 @@ DUPLICATE_PATTERNS=0
 # Buscar patrones de detección de servicios duplicados
 PATTERN="grep -E.*VERSION.*env"
 COUNT=$(grep -r "$PATTERN" "$PROJECT_ROOT/scripts" 2>/dev/null | \
-	grep -v "services.sh\|init.sh" | wc -l || echo "0")
+	grep -cv "services.sh\|init.sh" || echo "0")
 
 if [[ $COUNT -gt 5 ]]; then
 	log_warn "  Encontrados $COUNT patrones de detección de servicios"

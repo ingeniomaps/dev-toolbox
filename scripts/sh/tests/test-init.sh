@@ -39,14 +39,14 @@ run_test() {
 	local test_name="$1"
 	local test_func="$2"
 
-	printf "${YELLOW}Testing:${NC} $test_name... "
+	printf '%b' "${YELLOW}Testing:${NC} $test_name... "
 
 	if $test_func; then
-		printf "${GREEN}✓ PASSED${NC}\n"
+		printf '%b\n' "${GREEN}✓ PASSED${NC}"
 		TESTS_PASSED=$((TESTS_PASSED + 1))
 		return 0
 	else
-		printf "${RED}✗ FAILED${NC}\n"
+		printf '%b\n' "${RED}✗ FAILED${NC}"
 		TESTS_FAILED=$((TESTS_FAILED + 1))
 		return 1
 	fi

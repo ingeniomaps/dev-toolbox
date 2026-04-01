@@ -159,12 +159,19 @@ rotate_log_if_needed() {
 		if [[ $rotated_count -gt $LOG_MAX_FILES ]]; then
 			# Encontrar el archivo más antiguo
 			local oldest
-			oldest=$(ls -t "$log_pattern" 2>/dev/null | tail -1)
+			oldest=$(find "$(dirname "$log_pattern")" \
+				-name "$(basename "$log_pattern")" -type f \
+				-printf '%T@ %p\n' 2>/dev/null \
+				| sort -n | head -1 | cut -d' ' -f2-)
 			if [[ -n "$oldest" ]] && [[ -f "$oldest" ]]; then
 				rm -f "$oldest" 2>/dev/null || true
 			fi
 		fi
-	done < <(ls -t "$log_pattern" 2>/dev/null | head -$((LOG_MAX_FILES + 1)) || true)
+	done < <(find "$(dirname "$log_pattern")" \
+		-name "$(basename "$log_pattern")" -type f \
+		-printf '%T@ %p\n' 2>/dev/null \
+		| sort -rn | head -$((LOG_MAX_FILES + 1)) \
+		| cut -d' ' -f2- || true)
 
 	return 0
 }
@@ -216,7 +223,7 @@ cleanup_old_logs() {
 	# Calcular fecha límite
 	local cutoff_date
 	cutoff_date=$(date -d "$LOG_RETENTION_DAYS days ago" +%s 2>/dev/null || \
-		date -v-${LOG_RETENTION_DAYS}d +%s 2>/dev/null || echo "0")
+		date -v-"${LOG_RETENTION_DAYS}"d +%s 2>/dev/null || echo "0")
 
 	local deleted_count=0
 

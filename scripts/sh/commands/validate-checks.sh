@@ -189,9 +189,9 @@ validate_ports() {
 	# Verificar puertos solo si PORTS está definido (desde Make: make validate PORTS="5432 80").
 	# Se muestra qué puertos están en uso; si PORTS está vacío, no se ejecuta.
 	if [[ -n "$ports_str" ]] && [[ -f "$commands_dir/check-ports.sh" ]]; then
-		local _ports_str
-		_ports_str=$(echo "$ports_str" | tr ',' ' ')
-		( IFS=' '; set -f; bash "$commands_dir/check-ports.sh" $_ports_str ) || true
+		local -a _ports_arr=()
+		IFS=' ' read -ra _ports_arr <<< "$(echo "$ports_str" | tr ',' ' ')"
+		bash "$commands_dir/check-ports.sh" "${_ports_arr[@]}" || true
 	fi
 
 	save_cache "$cache_key" "0" "$cache_dir"
