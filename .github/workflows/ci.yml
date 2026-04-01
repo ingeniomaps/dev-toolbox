@@ -100,6 +100,7 @@ jobs:
             echo "Instalando shellcheck..."
             sudo apt-get update && sudo apt-get install -y shellcheck
           fi
+          export PATH="$HOME/go/bin:$PATH"
           if ! command -v shfmt >/dev/null 2>&1; then
             echo "Instalando shfmt..."
             go install mvdan.cc/sh/v3/cmd/shfmt@latest || {
@@ -111,6 +112,7 @@ jobs:
 
       - name: Ejecutar linters
         run: |
+          export PATH="$HOME/go/bin:$PATH"
           echo "Ejecutando linters..."
           if [[ -f "scripts/sh/utils/lint.sh" ]]; then
             bash scripts/sh/utils/lint.sh --check-only || {
