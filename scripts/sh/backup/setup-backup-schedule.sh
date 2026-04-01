@@ -30,18 +30,16 @@ _script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_DIR="$_script_dir"
 unset _script_dir
 readonly COMMON_SCRIPTS_DIR="$SCRIPT_DIR/../common"
-_pr="${PROJECT_ROOT:-$(pwd)}"
-readonly PROJECT_ROOT="${_pr%/}"
-unset _pr
 
-if [[ -f "$COMMON_SCRIPTS_DIR/logging.sh" ]]; then
-	source "$COMMON_SCRIPTS_DIR/logging.sh"
+# Cargar helpers comunes
+if [[ -f "$COMMON_SCRIPTS_DIR/init.sh" ]]; then
+	source "$COMMON_SCRIPTS_DIR/init.sh"
+	init_script
 else
 	log_info() { echo "[INFO] $*"; }
 	log_warn() { echo "[WARN] $*" >&2; }
 	log_error() { echo "[ERROR] $*" >&2; }
 	log_success() { echo "[SUCCESS] $*"; }
-	[[ -f "$COMMON_SCRIPTS_DIR/colors.sh" ]] && source "$COMMON_SCRIPTS_DIR/colors.sh"
 fi
 
 readonly FREQUENCY="${1:-daily}"
