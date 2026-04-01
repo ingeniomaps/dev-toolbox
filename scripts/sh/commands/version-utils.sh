@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: version-utils.sh
+# Script: version-utils.sh
 # Ubicación: scripts/sh/commands/
 # ============================================================================
 # Funciones utilitarias para trabajar con versiones de servicios.
+#
+# Uso:
+#   source scripts/sh/commands/version-utils.sh
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Función: Normalizar nombre de servicio (aliases)

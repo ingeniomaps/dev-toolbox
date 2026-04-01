@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# docker-compose.sh
+# Script: docker-compose.sh
 # Ubicación: scripts/sh/common/
 # ============================================================================
 # Helper común para interacción con Docker Compose. Proporciona funciones para
@@ -19,6 +19,9 @@
 #   docker_compose_exec - Ejecuta comando en contenedor
 #   docker_compose_build - Construye imágenes
 #   docker_compose_pull - Descarga imágenes
+#
+# Retorno:
+#   N/A (sourced library)
 # ============================================================================
 
 # Evitar cargar múltiples veces
@@ -35,6 +38,7 @@ fi
 if ! command -v log_error >/dev/null 2>&1; then
 	log_error() { echo "[ERROR] $*" >&2; }
 	log_warn() { echo "[WARN] $*" >&2; }
+	# Fallback de log_info cuando logging.sh no está disponible
 	log_info() { echo "[INFO] $*"; }
 fi
 

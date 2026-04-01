@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# services.sh
+# Script: services.sh
 # Ubicación: scripts/sh/common/
 # ============================================================================
 # Helper común para detección y gestión de servicios. Proporciona funciones
@@ -16,6 +16,9 @@
 #   is_container_running - Verifica si un contenedor está corriendo
 #   get_service_version - Obtiene versión de un servicio desde .env
 #   service_exists - Verifica si un servicio existe (contenedor o comando make)
+#
+# Retorno:
+#   N/A (sourced library)
 # ============================================================================
 
 # Evitar cargar múltiples veces

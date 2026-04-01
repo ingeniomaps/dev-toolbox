@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: coverage-finder.sh
+# Script: coverage-finder.sh
 # Ubicación: scripts/sh/utils/
 # ============================================================================
 # Funciones para encontrar scripts y sus tests correspondientes.
+#
+# Uso:
+#   source scripts/sh/utils/coverage-finder.sh
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Directorios (deben ser definidos antes de usar estas funciones)

@@ -12,23 +12,6 @@
 #   $@ - (opcional) Lista de servicios. Si no se especifica, detecta desde
 #        variables *_VERSION en .env
 #
-# Variables de entorno:
-#   PROJECT_ROOT - Raíz del proyecto (default: $(pwd))
-#   SERVICES - Lista de servicios separados por espacios (opcional)
-#   SERVICE_PREFIX - Prefijo para nombres de contenedores (opcional)
-#   LOG_LEVEL_FILTER - Filtrar logs por nivel (opcional)
-#   LOG_DATE_FILTER - Filtrar logs por fecha (opcional)
-#   LOG_LINES_LIMIT - Límite de líneas por servicio (default: 100, max: 10000)
-#   LOG_BUFFER_SIZE - Tamaño de buffer para procesamiento (default: 8192)
-#   LOG_MAX_SERVICES - Máximo número de servicios a monitorear (default: 50)
-#
-# Opciones:
-#   --limit=N         - Límite de líneas por servicio (default: 100)
-#   --buffer-size=N   - Tamaño de buffer (default: 8192)
-#   --max-services=N  - Máximo número de servicios (default: 50)
-#   --tail-only       - Solo mostrar últimas líneas, no seguir logs
-#   --no-color        - Deshabilitar colores en logs
-#
 # Retorno:
 #   0 si la operación fue exitosa
 #   1 si hay errores

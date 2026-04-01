@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: coverage-stats.sh
+# Script: coverage-stats.sh
 # Ubicación: scripts/sh/utils/
 # ============================================================================
 # Funciones para calcular estadísticas de cobertura.
+#
+# Uso:
+#   source scripts/sh/utils/coverage-stats.sh
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Función: Contar tests en archivo BATS

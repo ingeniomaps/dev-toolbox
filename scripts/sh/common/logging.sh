@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# logging.sh
+# Script: logging.sh
 # Ubicación: scripts/sh/common/
 # ============================================================================
 # Sistema de logging con niveles, marcas de tiempo, colores, verbosidad y
@@ -24,6 +24,9 @@
 # NOTAS:
 #   - Requiere colors.sh (se carga desde el mismo directorio si existe).
 #   - Carga segura múltiples veces (LOGGING_LOADED).
+#
+# Retorno:
+#   N/A (sourced library)
 # ============================================================================
 
 # Evitar cargar múltiples veces
@@ -361,6 +364,7 @@ usage() {
 error() { log_error "$@"; }
 warn() { log_warn "$@"; }
 success() { log_success "$@"; }
+# Alias de log_info para compatibilidad
 info() { log_info "$@"; }
 
 # ============================================================================

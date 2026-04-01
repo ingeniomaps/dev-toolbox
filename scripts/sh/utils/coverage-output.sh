@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: coverage-output.sh
+# Script: coverage-output.sh
 # Ubicación: scripts/sh/utils/
 # ============================================================================
 # Funciones para generar salida en diferentes formatos (text, JSON, HTML).
+#
+# Uso:
+#   source scripts/sh/utils/coverage-output.sh
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Función: Generar salida en texto

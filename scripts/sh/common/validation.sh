@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# validation.sh
+# Script: validation.sh
 # Ubicación: scripts/sh/common/
 # ============================================================================
 # Helper común para validación de argumentos y parámetros. Proporciona funciones
@@ -21,6 +21,9 @@
 #   validate_ip - Valida que una IP sea válida (IPv4)
 #   validate_email - Valida que un email sea válido
 #   validate_url - Valida que una URL sea válida
+#
+# Retorno:
+#   N/A (sourced library)
 # ============================================================================
 
 # Evitar cargar múltiples veces

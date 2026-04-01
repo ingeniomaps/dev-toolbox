@@ -14,19 +14,12 @@
 #   is_windows_native
 #   require_unix
 #
-# Funciones:
-#   detect_os()          - Detecta OS y establece variables OS_TYPE, OS_NAME
-#   is_wsl()             - Verifica si está ejecutándose en WSL
-#   is_windows_native()  - Verifica si está ejecutándose en Windows nativo
-#   require_unix()       - Verifica que el OS sea compatible (Linux/macOS/WSL)
-#   get_os_name()        - Obtiene nombre amigable del OS
-#   get_wsl_info()       - Obtiene información sobre WSL si está disponible
+# Retorno:
+#   N/A (librería para source)
 #
-# Variables exportadas:
-#   OS_TYPE     - Tipo de OS: linux, darwin, windows, wsl
-#   OS_NAME     - Nombre del OS: Linux, macOS, Windows, WSL
-#   IS_WSL      - true/false si está en WSL
-#   IS_WINDOWS  - true/false si está en Windows (nativo o WSL)
+# Funciones: detect_os, is_wsl, is_windows_native, require_unix,
+#            get_os_name, get_wsl_info
+# Variables: OS_TYPE, OS_NAME, IS_WSL, IS_WINDOWS
 # ============================================================================
 
 set -euo pipefail

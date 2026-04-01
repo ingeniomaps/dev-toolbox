@@ -18,24 +18,11 @@
 #   NETWORK_IP: Dirección IP base para calcular el subnet (ej: 101.80.0.0)
 #   RECREATE: true para recrear red si existe con configuración diferente
 #
-# Priorización de variables:
-#   1. Variables pasadas como entorno (desde servicios que llaman este script)
-#   2. Variables desde .env principal (si no están definidas y el archivo existe)
-#
-# NOTAS:
-#   - Si la red ya existe con la configuración correcta, el script retorna éxito
-#   - Si la red existe con configuración diferente, muestra advertencia y opciones
-#   - Si hay conflictos de subnet, muestra advertencias y falla
-#   - NO crea .env automáticamente. Si no existe o no tiene las variables,
-#     genera error
-#   - NO usa valores por defecto. Las variables deben estar definidas
-#     explícitamente
-#   - Los servicios pueden pasar NETWORK_NAME y NETWORK_IP como variables de
-#     entorno para usar sus propios valores, priorizando sobre el .env principal
-#
 # Retorno:
 #   0 si la red existe o se creó correctamente
 #   1 si faltan variables o error al crear
+#
+# Priorización: env vars > .env. No usa valores por defecto.
 # ============================================================================
 
 set -euo pipefail

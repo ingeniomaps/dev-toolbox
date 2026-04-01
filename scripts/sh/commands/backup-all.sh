@@ -20,16 +20,6 @@
 #   PARALLEL - true: ejecutar en paralelo (equivalente a --parallel)
 #   MAX_PARALLEL - Número máximo de backups paralelos (equivalente a --max-parallel)
 #
-# Ejemplos:
-#   # Backup secuencial (default)
-#   ./scripts/sh/commands/backup-all.sh
-#
-#   # Backup en paralelo (todos a la vez)
-#   ./scripts/sh/commands/backup-all.sh --parallel
-#
-#   # Backup en paralelo con máximo 3 simultáneos
-#   ./scripts/sh/commands/backup-all.sh --parallel --max-parallel=3
-#
 # Retorno:
 #   0 si todos los backups fueron exitosos
 #   1 si algún backup falló (o 0 si --skip-missing está activo)

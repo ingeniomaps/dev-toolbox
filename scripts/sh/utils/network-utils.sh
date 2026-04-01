@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: network-utils.sh
+# Script: network-utils.sh
 # Ubicación: scripts/sh/utils/
 # ============================================================================
 # Funciones utilitarias para trabajar con redes Docker.
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Función: Unir elementos de un array con un separador

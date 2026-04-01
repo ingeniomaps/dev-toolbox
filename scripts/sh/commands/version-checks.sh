@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: version-checks.sh
+# Script: version-checks.sh
 # Ubicación: scripts/sh/commands/
 # ============================================================================
 # Funciones de validación para versiones de servicios.
+#
+# Uso:
+#   source scripts/sh/commands/version-checks.sh
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Función: Verificar versión muy antigua

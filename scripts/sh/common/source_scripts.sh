@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 # ============================================================================
-# source_scripts.sh
+# Script: source_scripts.sh
 # Ubicación: scripts/sh/common/
 # ============================================================================
 # Función para cargar de forma segura todos los scripts `.sh` de un directorio.

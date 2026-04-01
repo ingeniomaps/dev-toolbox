@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: validate-checks.sh
+# Script: validate-checks.sh
 # Ubicación: scripts/sh/commands/
 # ============================================================================
 # Funciones de validación específicas para diferentes aspectos del proyecto.
+#
+# Uso:
+#   source scripts/sh/commands/validate-checks.sh
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Función para validar .env y variables (con caché)

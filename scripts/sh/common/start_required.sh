@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 # ============================================================================
-# start_required.sh
+# Script: start_required.sh
 # Ubicación: scripts/sh/common/
 # ============================================================================
 # Funciones para iniciar contenedores y repositorios requeridos.
@@ -12,9 +13,8 @@
 # Variables de entorno:
 #   SERVICE_PREFIX - Prefijo del nombre del contenedor (opcional)
 #
-# Funciones:
-#   - start_required_containers: Inicia contenedores si no están en ejecución
-#   - start_required_repositories: Clona/actualiza repos y inicia contenedores
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # -------------------------------------------------------------------------

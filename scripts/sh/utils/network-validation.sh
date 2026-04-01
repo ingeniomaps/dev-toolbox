@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: network-validation.sh
+# Script: network-validation.sh
 # Ubicación: scripts/sh/utils/
 # ============================================================================
 # Funciones de validación para redes Docker.
+#
+# Uso:
+#   source scripts/sh/utils/network-validation.sh
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Función: Valida formato de IP base

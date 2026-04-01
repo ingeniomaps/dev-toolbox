@@ -12,6 +12,10 @@
 #   keychain_delete <service> <key>      - Elimina un secreto
 #   keychain_list <service>              - Lista secretos de un servicio
 #
+# Uso:
+#   source scripts/sh/utils/keychain.sh
+#   keychain_get "mi-servicio" "mi-clave"
+#
 # Variables de entorno:
 #   KEYCHAIN_BACKEND - Backend a usar: secret-tool (default en Linux),
 #                      security (default en macOS), pass

@@ -15,41 +15,22 @@
 #   make validate --only-env
 #   make validate --skip-cache
 #
-# Parámetros:
-#   $1 - Opcional. Variables adicionales a comprobar en .env, separadas por
-#        comas. Cada módulo o proyecto puede pasar las que necesite.
-#        Ej.: SERVICE_PREFIX,POSTGRES_PASSWORD
-#
-# Opciones:
-#   --only-env        - Solo valida .env y variables
-#   --only-ips        - Solo valida IPs
-#   --only-ports      - Solo valida puertos
-#   --only-versions   - Solo valida versiones
-#   --skip-cache      - Ignora caché y valida todo
-#   --parallel        - Ejecuta checks independientes en paralelo
-#   --cache-ttl=N     - TTL del caché en segundos (default: 300 = 5 minutos)
-#
-# Variables de entorno:
-#   PROJECT_ROOT - Raíz del proyecto (donde está .env). Make la pasa como $(CURDIR).
-#                  Si no se define, se usa $(pwd). Misma regla que init-env.
-#   PORTS - Opcional. Puertos a comprobar (espacios o comas). Si no se define,
-#           no se ejecuta check-ports. Ej.: PORTS="5432 80" o PORTS="5432,80"
-#   VALIDATE_CACHE_TTL - TTL del caché en segundos (default: 300)
-#   VALIDATE_SKIP_CACHE - true: ignora caché (equivalente a --skip-cache)
-#   VALIDATE_PARALLEL - true: ejecuta en paralelo (equivalente a --parallel)
-#
-# Requisitos:
-#   - .env en la raíz (recomendado: make init-env)
-#   - En .env (obligatorias): NETWORK_NAME, NETWORK_IP
-#   - En utils: ensure-network.sh, wait-for-service.sh, validate-ips.sh,
-#     check-ports.sh, check-version-compatibility.sh
-#   - validate-ips: solo se ejecuta si .env tiene variables _HOST, _IP o NETWORK_IP
-#   - check-ports: solo se ejecuta si PORTS está definido
-#   - make check-dependencies (Docker, docker-compose)
-#
 # Retorno:
 #   0 si la validación es exitosa
 #   1 si hay problemas
+#
+# Parámetros:
+#   $1 - Opcional. Variables adicionales separadas por comas.
+#
+# Opciones: --only-env, --only-ips, --only-ports, --only-versions,
+#           --skip-cache, --parallel, --cache-ttl=N
+#
+# Variables de entorno:
+#   PROJECT_ROOT - Raíz del proyecto (default: $(pwd))
+#   PORTS - Puertos a comprobar (espacios o comas, opcional)
+#   VALIDATE_CACHE_TTL - TTL del caché en segundos (default: 300)
+#   VALIDATE_SKIP_CACHE - true: ignora caché
+#   VALIDATE_PARALLEL - true: ejecuta en paralelo
 # ============================================================================
 
 set -euo pipefail

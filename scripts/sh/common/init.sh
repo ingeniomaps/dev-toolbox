@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# init.sh
+# Script: init.sh
 # Ubicación: scripts/sh/common/
 # ============================================================================
 # Helper común para inicialización de scripts. Proporciona funciones para
@@ -19,6 +19,9 @@
 #   SCRIPT_DIR - Directorio del script actual
 #   COMMON_SCRIPTS_DIR - Directorio de scripts comunes
 #   PROJECT_ROOT - Raíz del proyecto (normalizada)
+#
+# Retorno:
+#   N/A (sourced library)
 # ============================================================================
 
 # Evitar cargar múltiples veces
@@ -57,6 +60,7 @@ init_script() {
 	if [[ -f "$SCRIPT_DIR/../utils/detect-os.sh" ]]; then
 		source "$SCRIPT_DIR/../utils/detect-os.sh" 2>/dev/null || true
 		if is_windows_native 2>/dev/null; then
+			# Fallback de log_warn para advertencias en Windows nativo
 			log_warn() { echo "[WARN] $*" >&2; }
 			log_warn "Este script requiere un entorno Unix (Linux, macOS, o WSL)"
 			log_warn "Windows nativo no es compatible. Usa WSL: docs/WSL_SETUP.md"

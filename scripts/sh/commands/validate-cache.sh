@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: validate-cache.sh
+# Script: validate-cache.sh
 # Ubicación: scripts/sh/commands/
 # ============================================================================
 # Funciones de caché para el sistema de validación.
+#
+# Uso:
+#   source scripts/sh/commands/validate-cache.sh
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Función para obtener hash de archivo .env para invalidar caché cuando cambia

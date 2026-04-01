@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# error-handling.sh
+# Script: error-handling.sh
 # Ubicación: scripts/sh/common/
 # ============================================================================
 # Helper común para manejo de errores. Proporciona funciones para manejar
@@ -17,6 +17,9 @@
 #   check_exit_code - Verifica código de salida y maneja errores
 #   safe_exec - Ejecuta comando de forma segura con manejo de errores
 #   rollback_on_error - Ejecuta rollback si hay error
+#
+# Retorno:
+#   N/A (sourced library)
 # ============================================================================
 
 # Evitar cargar múltiples veces
@@ -33,6 +36,7 @@ fi
 if ! command -v log_error >/dev/null 2>&1; then
 	log_error() { echo "[ERROR] $*" >&2; }
 	log_warn() { echo "[WARN] $*" >&2; }
+	# Fallback de log_info cuando logging.sh no está disponible
 	log_info() { echo "[INFO] $*"; }
 fi
 

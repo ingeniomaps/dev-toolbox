@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Funciones: network-ensure.sh
+# Script: network-ensure.sh
 # Ubicación: scripts/sh/utils/
 # ============================================================================
 # Función principal para crear/verificar redes Docker.
+#
+# Uso:
+#   source scripts/sh/utils/network-ensure.sh
+#
+# Retorno:
+#   N/A (librería para source)
 # ============================================================================
 
 # Función: Comprueba si una red de Docker existe; la crea si no existe

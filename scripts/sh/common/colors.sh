@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# colors.sh
+# Script: colors.sh
 # Ubicación: scripts/sh/common/
 # ============================================================================
 # Define variables de color ANSI para scripts Bash. Se desactivan si no hay
@@ -21,6 +21,9 @@
 #   - Cerrar siempre con COLOR_RESET. Usar echo -e para secuencias de escape.
 #   - Carga segura múltiples veces (COLORS_LOADED).
 #   - FORCE_COLOR=1: activar colores aunque stdout/stderr no sean TTY (p. ej. al llamar desde make).
+#
+# Retorno:
+#   N/A (sourced library)
 # ============================================================================
 
 # Evitar cargar múltiples veces si las variables ya están definidas

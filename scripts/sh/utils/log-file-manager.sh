@@ -12,6 +12,10 @@
 #   cleanup_old_logs <directorio>   - Limpia logs antiguos
 #   get_log_config                  - Obtiene configuración centralizada
 #
+# Uso:
+#   source scripts/sh/utils/log-file-manager.sh
+#   setup_log_file "/ruta/al/archivo.log"
+#
 # Variables de entorno:
 #   LOG_DIR              - Directorio base para logs (default: PROJECT_ROOT/logs)
 #   LOG_MAX_SIZE         - Tamaño máximo en MB antes de rotar (default: 10)
