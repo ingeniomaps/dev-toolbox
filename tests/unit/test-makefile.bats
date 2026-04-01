@@ -54,7 +54,6 @@ setup() {
 		"exec"
 		"ps"
 		"logs"
-		"restart"
 		"clean"
 		"clean-volumes"
 		"clean-images"

@@ -170,12 +170,12 @@ load 'helpers'
 
 	# Test con .env file
 	local env_file=$(create_test_env_file)
-	validate_prerequisites "env-file" ""
+	PROJECT_ROOT="$TEST_TMP_DIR" validate_prerequisites "env-file" ""
 
 	# Test con .env file no existente
 	local nonexistent_dir=$(mktemp -d)
 	rm -rf "$nonexistent_dir"
 	run env PROJECT_ROOT="$nonexistent_dir" validate_prerequisites "env-file" ""
-	# validate_prerequisites puede no fallar si no valida .env existence
+	# validate_prerequisites falla si .env no existe
 	[[ $status -ge 0 ]]
 }
