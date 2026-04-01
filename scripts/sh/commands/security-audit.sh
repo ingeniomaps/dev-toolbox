@@ -172,8 +172,8 @@ echo ""
 
 # 7. Verificar secretos próximos a expirar
 log_info "7. Verificando expiración de secretos..."
-if [[ -f "$COMMANDS_DIR/check-secrets-expiry.sh" ]]; then
-	if bash "$COMMANDS_DIR/check-secrets-expiry.sh" --warn-only --days=30 >/dev/null 2>&1; then
+if [[ -f "$SCRIPT_DIR/check-secrets-expiry.sh" ]]; then
+	if bash "$SCRIPT_DIR/check-secrets-expiry.sh" --warn-only --days=30 >/dev/null 2>&1; then
 		log_success "  No hay secretos próximos a expirar"
 		AUDIT_REPORT+=('{"category": "secrets-expiry", "status": "ok"}')
 	else
