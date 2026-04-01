@@ -37,24 +37,6 @@ jobs:
           fi
           echo "✓ Todas las líneas cumplen con el límite de 120 caracteres"
 
-      - name: Verificar estructura de directorios
-        run: |
-          echo "Verificando estructura de directorios..."
-          REQUIRED_DIRS=(
-            "scripts/sh/common"
-            "scripts/sh/commands"
-            "scripts/sh/utils"
-            "makefiles/main"
-          )
-
-          for dir in "${REQUIRED_DIRS[@]}"; do
-            if [[ ! -d "$dir" ]]; then
-              echo "❌ Directorio requerido no encontrado: $dir"
-              exit 1
-            fi
-          done
-          echo "✓ Estructura de directorios correcta"
-
       - name: Instalar BATS
         run: |
           echo "Instalando BATS..."
@@ -172,6 +154,40 @@ jobs:
           echo "=========================================="
           echo "✓ Verificación de calidad completada"
           echo "=========================================="
+
+  validate-config:
+    name: Validación de Configuración
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Verificar que .env-template existe
+        run: |
+          if [[ ! -f ".env-template" ]]; then
+            echo "⚠️  .env-template no encontrado (puede ser opcional)"
+          else
+            echo "✓ .env-template encontrado"
+          fi
+
+      - name: Verificar estructura de directorios
+        run: |
+          echo "Verificando estructura de directorios..."
+          REQUIRED_DIRS=(
+            "scripts/sh/common"
+            "scripts/sh/commands"
+            "scripts/sh/utils"
+            "makefiles/main"
+          )
+
+          for dir in "${REQUIRED_DIRS[@]}"; do
+            if [[ ! -d "$dir" ]]; then
+              echo "❌ Directorio requerido no encontrado: $dir"
+              exit 1
+            fi
+          done
+          echo "✓ Estructura de directorios correcta"
 
   compatibility-tests:
     name: Tests de Compatibilidad
