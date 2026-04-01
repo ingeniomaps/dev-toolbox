@@ -34,9 +34,7 @@ if [[ -f "$COMMON_SCRIPTS_DIR/init.sh" ]]; then
 	source "$COMMON_SCRIPTS_DIR/init.sh"
 	init_script
 else
-	_pr="${PROJECT_ROOT:-$(pwd)}"
-	readonly PROJECT_ROOT="${_pr%/}"
-	unset _pr
+	# PROJECT_ROOT ya fue declarado readonly arriba; solo cargar logging.
 	if [[ -f "$COMMON_SCRIPTS_DIR/logging.sh" ]]; then
 		source "$COMMON_SCRIPTS_DIR/logging.sh"
 	fi

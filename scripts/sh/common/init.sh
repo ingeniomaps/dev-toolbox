@@ -50,12 +50,8 @@ init_script() {
 		_pr="$(pwd)"
 		readonly PROJECT_ROOT="${_pr%/}"
 		unset _pr
-	else
-		# Normalizar PROJECT_ROOT (remover trailing slash)
-		local _pr="${PROJECT_ROOT%/}"
-		readonly PROJECT_ROOT="$_pr"
-		unset _pr
 	fi
+	# Si PROJECT_ROOT ya existe (readonly o no), no re-declarar.
 
 	# Detectar OS y mostrar advertencia si es Windows nativo
 	if [[ -f "$SCRIPT_DIR/../utils/detect-os.sh" ]]; then
