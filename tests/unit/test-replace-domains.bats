@@ -107,7 +107,7 @@ EOF
 
 	local file_content=$(cat "$test_file")
 	local count=$(echo "$file_content" | grep -o "newdomain.com" | wc -l)
-	[[ $count -eq 2 ]] || [[ $count -ge 1 ]]  "Debería reemplazar todas las ocurrencias"
+	[[ $count -ge 1 ]]
 }
 
 @test "replace-domains.sh maneja archivos sin el dominio" {
