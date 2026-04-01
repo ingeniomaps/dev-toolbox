@@ -35,11 +35,12 @@ validate_env_and_vars() {
 		result=1
 	fi
 
-	# Verificar variables en .env: obligatorias (NETWORK_NAME, NETWORK_IP) y
-	# las adicionales que vengan en $extra_vars (separadas por comas)
+	# Verificar variables en .env: obligatorias (NETWORK_NAME) y
+	# las adicionales que vengan en $extra_vars (separadas por comas).
+	# NETWORK_IP es opcional — no todos los proyectos usan IPs fijas.
 	if [[ -f "$env_file" ]]; then
 		local MISSING_VARS=""
-		local REQUIRED_VARS="NETWORK_NAME NETWORK_IP"
+		local REQUIRED_VARS="NETWORK_NAME"
 		# IFS=$'\n\t' quita el espacio; partir explicitamente por espacios
 		for var in $(echo "$REQUIRED_VARS" | tr ' ' '\n'); do
 			[[ -z "$var" ]] && continue
@@ -155,10 +156,10 @@ validate_ips() {
 		return
 	fi
 
-	# Validar IPs solo si .env define variables de red (_HOST, _IP, NETWORK_IP).
-	# Se muestra qué IPs son inválidas; si no hay variables, no se ejecuta.
+	# Validar IPs solo si .env define variables _IP o NETWORK_IP.
+	# Variables _HOST se omiten (pueden ser hostnames).
 	if [[ -f "$env_file" ]] && [[ -f "$commands_dir/validate-ips.sh" ]] && \
-		grep -qE "(_HOST=|_IP=|NETWORK_IP=)" "$env_file" 2>/dev/null; then
+		grep -qE "(_IP=|NETWORK_IP=)" "$env_file" 2>/dev/null; then
 		bash "$commands_dir/validate-ips.sh" "$env_file" || true
 	fi
 

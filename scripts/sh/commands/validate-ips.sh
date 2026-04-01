@@ -54,9 +54,10 @@ log_info "Validando formato de IPs en $ENV_FILE..."
 
 EXIT_CODE=0
 
-# Extraer valores de IP de variables que terminan en _HOST, _IP o NETWORK_IP
+# Extraer valores de variables que terminan en _IP o NETWORK_IP.
+# Variables _HOST se omiten: pueden ser hostnames legitimos (redis, postgres, etc).
 # Ignorar comentarios y líneas vacías
-IP_VARS=$(grep -E ".*_HOST=|.*_IP=|NETWORK_IP=" "$ENV_FILE" 2>/dev/null | \
+IP_VARS=$(grep -E ".*_IP=|NETWORK_IP=" "$ENV_FILE" 2>/dev/null | \
 	grep -v '^[[:space:]]*#' | cut -d'=' -f2- | tr -d ' ' || true)
 
 if [[ -z "$IP_VARS" ]]; then
