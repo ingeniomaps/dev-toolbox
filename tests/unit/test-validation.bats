@@ -13,7 +13,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 @test "validation.sh existe" {
 	assert_file_exists "$TEST_COMMON_DIR/validation.sh"

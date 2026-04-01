@@ -13,7 +13,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 @test "init-env.sh existe" {
 	assert_file_exists "$TEST_SCRIPTS_DIR/setup/init-env.sh"

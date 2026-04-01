@@ -15,7 +15,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 @test "wait-for-service.sh existe" {
 	assert_file_exists "$TEST_SCRIPTS_DIR/utils/wait-for-service.sh"

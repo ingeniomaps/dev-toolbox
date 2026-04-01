@@ -6,7 +6,7 @@
 # Helpers comunes para tests unitarios con BATS.
 #
 # Uso:
-#   load 'tests/unit/helpers.bash'
+#   load 'helpers'
 #
 # Funciones disponibles:
 #   setup_test_environment - Configura entorno de test

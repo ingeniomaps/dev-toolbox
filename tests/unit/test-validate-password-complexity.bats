@@ -13,7 +13,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 @test "validate-password-complexity.sh existe" {
 	assert_file_exists "$TEST_SCRIPTS_DIR/utils/validate-password-complexity.sh"

@@ -13,7 +13,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 @test "improved-secrets-check.sh existe" {
 	assert_file_exists "$TEST_SCRIPTS_DIR/commands/improved-secrets-check.sh"

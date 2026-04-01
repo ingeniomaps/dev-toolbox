@@ -13,7 +13,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 setup() {
 	# Directorio del proyecto

@@ -6,7 +6,7 @@
 # Tests para check-secrets-expiry.sh
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 setup() {
 	export TEST_PROJECT_ROOT="$(cd "$(dirname "${BATS_TEST_FILENAME}")/../.." && pwd)"

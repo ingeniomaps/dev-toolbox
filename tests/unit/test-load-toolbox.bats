@@ -15,7 +15,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 @test "load-toolbox.sh existe" {
 	assert_file_exists "$TEST_SCRIPTS_DIR/setup/load-toolbox.sh"

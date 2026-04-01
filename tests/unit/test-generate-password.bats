@@ -13,7 +13,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 @test "generate-password.sh existe" {
 	assert_file_exists "$TEST_SCRIPTS_DIR/utils/generate-password.sh"

@@ -13,7 +13,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/unit/helpers.bash'
+load 'helpers'
 
 @test "check-version-compatibility.sh existe" {
 	assert_file_exists "$TEST_SCRIPTS_DIR/commands/check-version-compatibility.sh"
