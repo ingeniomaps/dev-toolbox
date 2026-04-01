@@ -14,7 +14,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/integration/helpers.bash'
+load 'helpers'
 
 # Setup específico para tests de compatibilidad Bash
 setup() {

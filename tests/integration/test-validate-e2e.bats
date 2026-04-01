@@ -14,7 +14,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/integration/helpers.bash'
+load 'helpers'
 
 # Setup específico para test E2E de validate
 setup() {

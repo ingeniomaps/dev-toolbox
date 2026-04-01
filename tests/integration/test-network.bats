@@ -16,7 +16,7 @@
 #   1 si algún test falló
 # ============================================================================
 
-load 'tests/integration/helpers.bash'
+load 'helpers'
 
 @test "ensure-network.sh existe" {
 	assert_file_exists "$TEST_SCRIPTS_DIR/utils/ensure-network.sh"

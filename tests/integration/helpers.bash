@@ -6,7 +6,7 @@
 # Helpers comunes para tests de integración con BATS.
 #
 # Uso:
-#   load 'tests/integration/helpers.bash'
+#   load 'helpers'
 #
 # Funciones disponibles:
 #   setup_integration_test - Configura entorno de integración
