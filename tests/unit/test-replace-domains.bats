@@ -32,8 +32,7 @@ load 'helpers'
 
 	echo "Config for olddomain.com" > "$test_file"
 
-	run bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com"
 
 	assert_success "$output" "$status" "Debería reemplazar dominio exitosamente"
 
@@ -46,8 +45,7 @@ load 'helpers'
 @test "replace-domains.sh maneja dominios iguales" {
 	local project_dir=$(create_temp_dir)
 
-	run bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "samedomain.com" "samedomain.com" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "samedomain.com" "samedomain.com"
 
 	# Debería retornar éxito pero no hacer nada
 	[[ $status -eq 0 ]]
@@ -57,8 +55,7 @@ load 'helpers'
 @test "replace-domains.sh valida que dominios no estén vacíos" {
 	local project_dir=$(create_temp_dir)
 
-	run bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "" "olddomain.com" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "" "olddomain.com"
 
 	assert_failure "$output" "$status" "Debería fallar con dominio vacío"
 	assert_contains "$output" "no pueden estar vacíos" "Debería indicar que no pueden estar vacíos"
@@ -71,8 +68,7 @@ load 'helpers'
 
 	echo "olddomain.com" > "$git_file"
 
-	run bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com"
 
 	# Verificar que .git fue excluido
 	local git_content=$(cat "$git_file")
@@ -85,8 +81,7 @@ load 'helpers'
 
 	echo "olddomain.com" > "$md_file"
 
-	run bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com"
 
 	# Verificar que .md fue excluido
 	local md_content=$(cat "$md_file")
@@ -102,8 +97,7 @@ Config for olddomain.com
 Another reference to olddomain.com
 EOF
 
-	run bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com"
 
 	local file_content=$(cat "$test_file")
 	local count=$(echo "$file_content" | grep -o "newdomain.com" | wc -l)
@@ -116,8 +110,7 @@ EOF
 
 	echo "No domain here" > "$test_file"
 
-	run bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" bash "$TEST_SCRIPTS_DIR/utils/replace-domains.sh" "newdomain.com" "olddomain.com"
 
 	# Debería ejecutarse sin error aunque no haya nada que reemplazar
 	[[ $status -ge 0 ]]

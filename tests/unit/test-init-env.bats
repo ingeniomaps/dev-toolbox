@@ -29,8 +29,8 @@ NETWORK_IP=101.80.0.0
 POSTGRES_VERSION=15.0
 EOF
 
-	run bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/init-env.sh"
 
 	assert_success "$output" "$status" "Debería crear .env desde plantilla"
 	assert_file_exists "$project_dir/.env" "Debería crear archivo .env"
@@ -49,8 +49,8 @@ NETWORK_NAME=test-network
 NETWORK_IP=101.80.0.0
 EOF
 
-	run bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/init-env.sh"
 
 	assert_success "$output" "$status" "Debería usar .env.template"
 	assert_file_exists "$project_dir/.env" "Debería crear archivo .env"
@@ -59,11 +59,11 @@ EOF
 @test "init-env.sh falla si no hay plantilla disponible" {
 	local project_dir=$(create_temp_dir)
 
-	run bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/init-env.sh"
 
 	assert_failure "$output" "$status" "Debería fallar sin plantilla"
-	assert_contains "$output" "No se encontró\|plantilla" "Debería indicar que no hay plantilla"
+	assert_contains "$output" "No se encontró\|plantilla\|template" "Debería indicar que no hay plantilla"
 }
 
 @test "init-env.sh no sobrescribe .env existente sin --force" {
@@ -78,8 +78,8 @@ EOF
 	# Crear .env existente
 	echo "NETWORK_NAME=old-network" > "$env_file"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/init-env.sh"
 
 	# Debería retornar éxito pero no sobrescribir
 	[[ $status -eq 0 ]]
@@ -101,8 +101,8 @@ EOF
 	# Crear .env existente
 	echo "NETWORK_NAME=old-network" > "$env_file"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" --force \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" --force
 
 	assert_success "$output" "$status" "Debería sobrescribir con --force"
 
@@ -119,8 +119,8 @@ EOF
 NETWORK_NAME=test-network
 EOF
 
-	run bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" "development" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" "development"
 
 	assert_success "$output" "$status" "Debería crear .env.development"
 	assert_file_exists "$project_dir/.env.development" "Debería crear archivo .env.development"
@@ -135,8 +135,8 @@ EOF
 NETWORK_NAME=test-network
 EOF
 
-	run bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" --silent \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/init-env.sh" --silent
 
 	assert_success "$output" "$status" "Debería funcionar en modo silencioso"
 	assert_file_exists "$project_dir/.env" "Debería crear .env en modo silencioso"

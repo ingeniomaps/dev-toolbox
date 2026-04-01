@@ -153,19 +153,21 @@ assert_dir_exists() {
 	return 0
 }
 
-# Verifica que un string contiene un substring
+# Verifica que un string contiene un substring o patrón grep (BRE).
+# Soporta \| como alternación y .* como comodín.
 assert_contains() {
 	local haystack="$1"
 	local needle="$2"
 	local message="${3:-String debería contener: $needle}"
 
-	if [[ "$haystack" != *"$needle"* ]]; then
-		echo "❌ FAIL: $message"
-		echo "   Haystack: $haystack"
-		echo "   Needle: $needle"
-		return 1
+	if echo "$haystack" | grep -q "$needle" 2>/dev/null; then
+		return 0
 	fi
-	return 0
+
+	echo "❌ FAIL: $message"
+	echo "   Haystack: $haystack"
+	echo "   Needle: $needle"
+	return 1
 }
 
 # Verifica que un string no contiene un substring

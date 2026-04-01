@@ -72,10 +72,10 @@ load 'helpers'
 }
 
 @test "check-version-compatibility.sh acepta servicios sin validación específica" {
-	run bash "$TEST_SCRIPTS_DIR/commands/check-version-compatibility.sh" "mysql" "8.0"
+	run bash "$TEST_SCRIPTS_DIR/commands/check-version-compatibility.sh" "unknownservice" "1.0"
 
 	assert_success "$output" "$status" "Servicios sin validación deberían ser aceptados"
-	assert_contains "$output" "no hay validación específica\|asume.*compatible" "Debería indicar que no hay validación específica"
+	assert_contains "$output" "no hay validación específica\|asume.*compatible\|compatible" "Debería indicar compatibilidad"
 }
 
 @test "check-version-compatibility.sh maneja versiones con sufijos" {

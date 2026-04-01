@@ -15,10 +15,6 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Configurar Bash
-        run: |
-          echo "BASH_VERSION=$(bash --version | head -n1)" >> $GITHUB_ENV
-
       - name: Verificar sintaxis de scripts
         run: |
           echo "Verificando sintaxis de scripts..."
@@ -41,24 +37,23 @@ jobs:
           fi
           echo "✓ Todas las líneas cumplen con el límite de 120 caracteres"
 
-      - name: Verificar uso de init.sh en scripts nuevos
+      - name: Verificar estructura de directorios
         run: |
-          echo "Verificando uso de init.sh en scripts de commands/..."
-          MISSING_INIT=0
+          echo "Verificando estructura de directorios..."
+          REQUIRED_DIRS=(
+            "scripts/sh/common"
+            "scripts/sh/commands"
+            "scripts/sh/utils"
+            "makefiles/main"
+          )
 
-          for script in scripts/sh/commands/*.sh; do
-            if ! grep -q "init_script\|source.*init.sh" "$script" 2>/dev/null; then
-              echo "⚠️  Script sin init.sh: $script"
-              MISSING_INIT=$((MISSING_INIT + 1))
+          for dir in "${REQUIRED_DIRS[@]}"; do
+            if [[ ! -d "$dir" ]]; then
+              echo "❌ Directorio requerido no encontrado: $dir"
+              exit 1
             fi
           done
-
-          if [[ $MISSING_INIT -gt 0 ]]; then
-            echo "⚠️  $MISSING_INIT scripts en commands/ no usan init.sh"
-            echo "Nota: Esto es una advertencia, no un error. Los scripts antiguos pueden no usar init.sh."
-          else
-            echo "✓ Todos los scripts verificados usan init.sh o tienen fallback"
-          fi
+          echo "✓ Estructura de directorios correcta"
 
       - name: Instalar BATS
         run: |
@@ -102,18 +97,6 @@ jobs:
             fi
           else
             echo "⚠️  No hay tests de integración en tests/integration/"
-          fi
-
-      - name: Ejecutar tests de compatibilidad
-        run: |
-          echo "Ejecutando tests de compatibilidad..."
-          export PATH="$PWD/.bats/bin:$PATH"
-          if [[ -d "tests/integration" ]]; then
-            # Ejecutar tests de compatibilidad (pueden saltar algunos si no aplican)
-            bats tests/integration/test-compatibility-docker-compose.bats || true
-            bats tests/integration/test-compatibility-os.bats || true
-            bats tests/integration/test-compatibility-bash.bats || true
-            echo "✓ Tests de compatibilidad ejecutados"
           fi
 
       - name: Ejecutar tests legacy de helpers
@@ -190,46 +173,11 @@ jobs:
           echo "✓ Verificación de calidad completada"
           echo "=========================================="
 
-  validate-config:
-    name: Validación de Configuración
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout código
-        uses: actions/checkout@v4
-
-      - name: Verificar que .env-template existe
-        run: |
-          if [[ ! -f ".env-template" ]]; then
-            echo "⚠️  .env-template no encontrado (puede ser opcional)"
-          else
-            echo "✓ .env-template encontrado"
-          fi
-
-      - name: Verificar estructura de directorios
-        run: |
-          echo "Verificando estructura de directorios..."
-          REQUIRED_DIRS=(
-            "scripts/sh/common"
-            "scripts/sh/commands"
-            "scripts/sh/utils"
-            "makefiles/main"
-          )
-
-          for dir in "${REQUIRED_DIRS[@]}"; do
-            if [[ ! -d "$dir" ]]; then
-              echo "❌ Directorio requerido no encontrado: $dir"
-              exit 1
-            fi
-          done
-          echo "✓ Estructura de directorios correcta"
-
   compatibility-tests:
     name: Tests de Compatibilidad
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        bash-version: [4, 5]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -259,20 +207,23 @@ jobs:
       - name: Ejecutar tests de compatibilidad OS
         run: |
           export PATH="$PWD/.bats/bin:$PATH"
-          bats tests/integration/test-compatibility-os.bats || true
+          if [[ -f "tests/integration/test-compatibility-os.bats" ]]; then
+            bats tests/integration/test-compatibility-os.bats || true
+          fi
 
       - name: Ejecutar tests de compatibilidad Bash
         run: |
           export PATH="$PWD/.bats/bin:$PATH"
-          bats tests/integration/test-compatibility-bash.bats || true
+          if [[ -f "tests/integration/test-compatibility-bash.bats" ]]; then
+            bats tests/integration/test-compatibility-bash.bats || true
+          fi
 
       - name: Ejecutar tests de compatibilidad Docker Compose
         if: runner.os == 'Linux'
         run: |
           export PATH="$PWD/.bats/bin:$PATH"
-          # Instalar Docker si no está disponible
           if ! command -v docker >/dev/null 2>&1; then
             echo "Docker no está disponible en este runner"
-          else
+          elif [[ -f "tests/integration/test-compatibility-docker-compose.bats" ]]; then
             bats tests/integration/test-compatibility-docker-compose.bats || true
           fi

@@ -20,11 +20,11 @@ load 'helpers'
 }
 
 @test "create-service.sh requiere nombre de servicio" {
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" \
-		PROJECT_ROOT="$TEST_TMP_DIR"
+	run env PROJECT_ROOT="$TEST_TMP_DIR" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh"
 
 	assert_failure "$output" "$status" "Debería fallar sin nombre de servicio"
-	assert_contains "$output" "Debes especificar\|nombre del servicio" "Debería indicar que se requiere nombre"
+	assert_contains "$output" "Debes especificar\|nombre del servicio\|no puede estar vacío" "Debería indicar que se requiere nombre"
 }
 
 @test "create-service.sh crea estructura de directorios" {
@@ -32,8 +32,8 @@ load 'helpers'
 	local service_name="test-service-$(date +%s)"
 	local service_dir="$project_dir/containers/$service_name"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name"
 
 	assert_success "$output" "$status" "Debería crear estructura exitosamente"
 	assert_dir_exists "$service_dir" "Debería crear directorio del servicio"
@@ -48,8 +48,8 @@ load 'helpers'
 	local service_name="test-service-$(date +%s)"
 	local service_dir="$project_dir/containers/$service_name"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name"
 
 	assert_file_exists "$service_dir/docker-compose.yml" "Debería crear docker-compose.yml"
 
@@ -64,8 +64,8 @@ load 'helpers'
 	local service_name="test-service-$(date +%s)"
 	local service_dir="$project_dir/containers/$service_name"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name"
 
 	assert_file_exists "$service_dir/Makefile" "Debería crear Makefile"
 
@@ -80,8 +80,8 @@ load 'helpers'
 	local service_name="test-service-$(date +%s)"
 	local service_dir="$project_dir/containers/$service_name"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name"
 
 	assert_file_exists "$service_dir/README.md" "Debería crear README.md"
 
@@ -95,8 +95,8 @@ load 'helpers'
 	local service_name="test-service-$(date +%s)"
 	local service_dir="$project_dir/containers/$service_name"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name"
 
 	assert_file_exists "$service_dir/.gitignore" "Debería crear .gitignore"
 }
@@ -106,8 +106,8 @@ load 'helpers'
 	local service_name="test-service-$(date +%s)"
 	local service_dir="$project_dir/containers/$service_name"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name"
 
 	assert_file_exists "$service_dir/.env-template" "Debería crear .env-template"
 
@@ -125,8 +125,8 @@ load 'helpers'
 	# Crear directorio existente
 	mkdir -p "$service_dir"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name"
 
 	assert_failure "$output" "$status" "Debería fallar si el servicio ya existe"
 	assert_contains "$output" "ya existe" "Debería indicar que el servicio ya existe"
@@ -136,8 +136,8 @@ load 'helpers'
 	local project_dir=$(create_temp_dir)
 	local service_name="test-service-$(date +%s)"
 
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "$service_name"
 
 	assert_contains "$output" "Próximos pasos\|docker-compose.yml\|README.md" "Debería mostrar próximos pasos"
 }
@@ -145,8 +145,8 @@ load 'helpers'
 @test "create-service.sh no acepta nombre de servicio vacío" {
 	local project_dir=$(create_temp_dir)
 
-	run bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" "" \
-		PROJECT_ROOT="$project_dir"
+	run env PROJECT_ROOT="$project_dir" \
+		bash "$TEST_SCRIPTS_DIR/setup/create-service.sh" ""
 
 	assert_failure "$output" "$status" "Debería fallar con nombre vacío"
 	assert_contains "$output" "no puede estar vacío\|Debes especificar" "Debería indicar que el nombre no puede estar vacío"

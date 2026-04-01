@@ -44,7 +44,7 @@ load 'helpers'
 
 	# Debería usar puertos por defecto
 	[[ $status -ge 0 ]]
-	assert_contains "$output" "5432\|27017\|6379\|80\|8081\|5540" "Debería verificar puertos por defecto"
+	assert_contains "$output" "5432" "Debería verificar puertos por defecto"
 }
 
 @test "check-ports.sh maneja correctamente cuando no hay herramienta de red" {

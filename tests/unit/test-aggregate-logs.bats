@@ -16,9 +16,9 @@ setup() {
 @test "aggregate-logs: muestra ayuda con --help" {
 	run bash "$TEST_COMMANDS_DIR/aggregate-logs.sh" --help
 
-	assert_success
-	assert_output --partial "Uso:"
-	assert_output --partial "aggregate-logs"
+	assert_success "$output" "$status"
+	assert_contains "$output" "Uso:"
+	assert_contains "$output" "aggregate-logs"
 }
 
 @test "aggregate-logs: acepta --limit para limitar líneas" {
@@ -28,33 +28,33 @@ setup() {
 	run bash -c "source <(sed 's/docker logs/\$DOCKER_CMD/g' \"$TEST_COMMANDS_DIR/aggregate-logs.sh\"); bash \"$TEST_COMMANDS_DIR/aggregate-logs.sh\" --limit=2 2>/dev/null || true"
 
 	# Verificar que se limita la salida
-	assert_success
+	assert_success "$output" "$status"
 }
 
 @test "aggregate-logs: acepta --max-services para limitar servicios" {
 	run bash "$TEST_COMMANDS_DIR/aggregate-logs.sh" --max-services=1 --help 2>&1 || true
 
 	# Verificar que acepta el parámetro
-	assert_output --partial "max-services" || true
+	assert_contains "$output" "max-services" || true
 }
 
 @test "aggregate-logs: acepta --tail-only para solo últimas líneas" {
 	run bash "$TEST_COMMANDS_DIR/aggregate-logs.sh" --tail-only --help 2>&1 || true
 
 	# Verificar que acepta el parámetro
-	assert_output --partial "tail-only" || true
+	assert_contains "$output" "tail-only" || true
 }
 
 @test "aggregate-logs: maneja servicios inexistentes" {
 	run bash "$TEST_COMMANDS_DIR/aggregate-logs.sh" servicio-inexistente 2>&1 || true
 
 	# No debería fallar catastróficamente
-	assert_output --partial "no encontrado" || assert_success
+	assert_contains "$output" "no encontrado" || assert_success "$output" "$status"
 }
 
 @test "aggregate-logs: acepta --buffer-size para tamaño de buffer" {
 	run bash "$TEST_COMMANDS_DIR/aggregate-logs.sh" --buffer-size=1024 --help 2>&1 || true
 
 	# Verificar que acepta el parámetro
-	assert_output --partial "buffer" || true
+	assert_contains "$output" "buffer" || true
 }

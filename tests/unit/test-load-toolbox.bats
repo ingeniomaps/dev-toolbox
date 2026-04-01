@@ -29,8 +29,8 @@ load 'helpers'
 }
 
 @test "load-toolbox.sh requiere GIT_TOKEN" {
-	run bash "$TEST_SCRIPTS_DIR/setup/load-toolbox.sh" \
-		GIT_USER="testuser"
+	run env GIT_USER="testuser" \
+		bash "$TEST_SCRIPTS_DIR/setup/load-toolbox.sh"
 
 	assert_failure "$output" "$status" "Debería fallar sin GIT_TOKEN"
 	assert_contains "$output" "GIT_TOKEN.*obligatorio\|requerido" "Debería indicar que GIT_TOKEN es requerido"
