@@ -3,8 +3,8 @@
 # Script: validate-passwords.sh
 # Ubicación: scripts/sh/commands/
 # ============================================================================
-# Detecta variables de contraseña en .env (PASSWORD, PWD, PASS, SECRET, KEY,
-# TOKEN) y valida complejidad con validate-password-complexity.sh.
+# Detecta variables de contraseña en .env (_PASSWORD, _PWD, _PASS, _SECRET,
+# _TOKEN, _API_KEY) y valida complejidad con validate-password-complexity.sh.
 #
 # Uso:
 #   ./scripts/sh/commands/validate-passwords.sh
@@ -56,15 +56,16 @@ log_step "Validando complejidad de contraseñas..."
 
 EXIT_CODE=0
 
-# Patrones para detectar variables de contraseña automáticamente
-# Reutiliza la misma lógica que improved-secrets-check.sh
+# Patrones para detectar variables de contraseña automaticamente.
+# Usan sufijo (_PASSWORD) en vez de subcadena (PASSWORD) para evitar
+# falsos positivos (ej: KEYCLOAK_URL contiene KEY pero no es password).
 readonly PASSWORD_PATTERNS=(
-	"PASSWORD"
-	"PWD"
-	"PASS"
-	"SECRET"
-	"KEY"
-	"TOKEN"
+	"_PASSWORD"
+	"_PWD"
+	"_PASS"
+	"_SECRET"
+	"_TOKEN"
+	"_API_KEY"
 )
 
 # Buscar y validar todas las variables de contraseña en .env

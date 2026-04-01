@@ -65,14 +65,16 @@ readonly INSECURE_PATTERNS=(
 # Nota: La validación de contraseñas débiles se delega a
 # validate-password-complexity.sh para evitar redundancia
 
-# Variables que deberían tener contraseñas seguras
+# Variables que deberían tener contraseñas seguras.
+# Solo se matchean como sufijo o palabra completa para evitar
+# falsos positivos (ej: KEYCLOAK_URL contiene KEY pero no es password).
 readonly PASSWORD_VARS=(
-	"PASSWORD"
-	"PWD"
-	"PASS"
-	"SECRET"
-	"KEY"
-	"TOKEN"
+	"_PASSWORD"
+	"_PWD"
+	"_PASS"
+	"_SECRET"
+	"_TOKEN"
+	"_API_KEY"
 )
 
 # Verificar patrones inseguros
