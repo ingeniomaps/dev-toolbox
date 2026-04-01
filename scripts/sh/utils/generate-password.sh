@@ -72,7 +72,7 @@ else
 	# Incluye: mayúsculas, minúsculas, números y caracteres especiales
 	tr -dc 'A-Za-z0-9!@#$%^&*()_+-=[]{}|;:,.<>?' < /dev/urandom | \
 		head -c "${LENGTH}" || \
-		cat /dev/urandom | tr -dc 'A-Za-z0-9!@#$%^&*()_+-=[]{}|;:,.<>?' | \
+		tr -dc 'A-Za-z0-9!@#$%^&*()_+-=[]{}|;:,.<>?' < /dev/urandom | \
 		head -c "${LENGTH}" || exit 1
 	echo ""
 fi

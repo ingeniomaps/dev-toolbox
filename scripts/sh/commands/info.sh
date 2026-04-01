@@ -44,7 +44,7 @@ echo ""
 # Versión del toolbox
 log_info "Versión del Toolbox:"
 if [[ -f "$VERSION_FILE" ]]; then
-	VERSION=$(cat "$VERSION_FILE" 2>/dev/null | tr -d '\n' || echo "desconocida")
+	VERSION=$(tr -d '\n' < "$VERSION_FILE" 2>/dev/null || echo "desconocida")
 	log_info "  $VERSION"
 else
 	log_info "  (no disponible)"

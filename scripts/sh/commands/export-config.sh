@@ -82,7 +82,7 @@ log_step "Exportando configuración a $FORMAT..."
 # Leer versión
 VERSION="desconocida"
 if [[ -f "$VERSION_FILE" ]]; then
-	VERSION=$(cat "$VERSION_FILE" 2>/dev/null | tr -d '\n' || echo "desconocida")
+	VERSION=$(tr -d '\n' < "$VERSION_FILE" 2>/dev/null || echo "desconocida")
 fi
 
 # Leer variables de .env (sin secretos)

@@ -239,7 +239,9 @@ cleanup_old_logs() {
 
 		# Si es más antiguo que el límite, eliminar
 		if [[ $file_date -lt $cutoff_date ]] && [[ $cutoff_date -gt 0 ]]; then
-			rm -f "$log_file" 2>/dev/null && deleted_count=$((deleted_count + 1)) || true
+			if rm -f "$log_file" 2>/dev/null; then
+				deleted_count=$((deleted_count + 1))
+			fi
 		fi
 	done < <(find "$log_dir" -type f \( -name "*.log" -o -name "*.log.*" -o -name "*.log.gz" \) 2>/dev/null || true)
 

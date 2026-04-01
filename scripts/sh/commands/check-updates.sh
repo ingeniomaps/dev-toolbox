@@ -73,7 +73,7 @@ if [[ "$DO_CHECK_TOOLBOX" == "true" ]]; then
 	VERSION_FILE="$TOOLBOX_ROOT/.version"
 
 	if [[ -f "$VERSION_FILE" ]]; then
-		CURRENT_VERSION=$(cat "$VERSION_FILE" 2>/dev/null | tr -d '\n' || echo "desconocida")
+		CURRENT_VERSION=$(tr -d '\n' < "$VERSION_FILE" 2>/dev/null || echo "desconocida")
 		log_info "  Versión actual: $CURRENT_VERSION"
 
 		# Intentar verificar en Git si es un repo (con retry)

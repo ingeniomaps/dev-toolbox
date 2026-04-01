@@ -19,4 +19,5 @@ source-path=scripts/sh/commands
 # SC1090: Can't follow non-constant source (carga dinámica)
 # SC1091: Not following: file not specified as input (residual con external-sources)
 # SC2016: Single-quoted expressions don't expand (intentional in sed patterns)
-disable=SC1090,SC1091,SC2016
+# SC2317: Command appears unreachable (false positive for else-branch fallbacks and trap handlers)
+disable=SC1090,SC1091,SC2016,SC2317

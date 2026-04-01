@@ -91,8 +91,18 @@ echo ""
 # 1. ShellCheck
 log_step "1. Ejecutando ShellCheck..."
 
-SHELLCHECK_OPTS="${SHELLCHECK_OPTS:-}"
 SHELLCHECK_CONFIG="${PROJECT_ROOT}/.shellcheckrc"
+
+# Construir opciones de shellcheck como array
+SHELLCHECK_ARGS=(-f gcc)
+if [[ ! -f "$SHELLCHECK_CONFIG" ]]; then
+	SHELLCHECK_ARGS+=(-s bash)
+fi
+# Agregar opciones adicionales si están definidas
+if [[ -n "${SHELLCHECK_OPTS:-}" ]]; then
+	read -ra _opts <<< "$SHELLCHECK_OPTS"
+	SHELLCHECK_ARGS+=("${_opts[@]}")
+fi
 
 SHELLCHECK_ERRORS=0
 SHELLCHECK_FILES=0
@@ -100,17 +110,9 @@ SHELLCHECK_FILES=0
 while IFS= read -r file; do
 	SHELLCHECK_FILES=$((SHELLCHECK_FILES + 1))
 
-	# Ejecutar shellcheck
-	if [[ -f "$SHELLCHECK_CONFIG" ]]; then
-		if ! shellcheck -f gcc "$SHELLCHECK_OPTS" "$file" 2>&1; then
-			SHELLCHECK_ERRORS=$((SHELLCHECK_ERRORS + 1))
-			EXIT_CODE=1
-		fi
-	else
-		if ! shellcheck -f gcc -s bash "$SHELLCHECK_OPTS" "$file" 2>&1; then
-			SHELLCHECK_ERRORS=$((SHELLCHECK_ERRORS + 1))
-			EXIT_CODE=1
-		fi
+	if ! shellcheck "${SHELLCHECK_ARGS[@]}" "$file" 2>/dev/null; then
+		SHELLCHECK_ERRORS=$((SHELLCHECK_ERRORS + 1))
+		EXIT_CODE=1
 	fi
 done < <(find "$PROJECT_ROOT/scripts/sh" -name "*.sh" -type f \
 	! -path "*/tests/*" ! -path "*/.bats/*")
