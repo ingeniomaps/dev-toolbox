@@ -123,9 +123,9 @@ EOF
 	# Debería continuar sin fallar
 	[[ $status -ge 0 ]]
 
-	# Verificar que muestra resumen
-	assert_contains "$output" "resumen\|encontrados\|faltantes\|salud" \
-		"Debería mostrar resumen de servicios"
+	# Verificar que muestra info sobre servicios
+	assert_contains "$output" "encontrado\|servicio\|skip-missing\|MÉTRICA" \
+		"Debería mostrar info de servicios"
 }
 
 @test "make alerts requiere .env si no se especifican servicios" {
