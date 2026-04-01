@@ -18,6 +18,11 @@
 #   cleanup_test_networks - Limpia redes de test
 # ============================================================================
 
+# Cargar funciones de aserción del helpers de unit tests
+_integration_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_integration_dir/../unit/helpers.bash"
+unset _integration_dir
+
 # Función helper para setup de integración (puede ser llamada desde tests E2E)
 setup_integration_test() {
 	# Directorio del proyecto
