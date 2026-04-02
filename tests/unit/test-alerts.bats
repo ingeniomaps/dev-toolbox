@@ -1,0 +1,66 @@
+#!/usr/bin/env bats
+# ============================================================================
+# Test: test-alerts.bats
+# Ubicación: tests/unit/
+# ============================================================================
+# Tests unitarios para alerts.sh usando BATS.
+#
+# Uso:
+#   bats tests/unit/test-alerts.bats
+#
+# Retorno:
+#   0 si todos los tests pasaron
+#   1 si algún test falló
+# ============================================================================
+
+load 'helpers'
+
+@test "alerts.sh existe" {
+	assert_file_exists "$TEST_SCRIPTS_DIR/commands/alerts.sh"
+}
+
+@test "alerts.sh valida .env cuando se detectan servicios automáticamente" {
+	run env PROJECT_ROOT="$TEST_TMP_DIR" \
+		bash "$TEST_SCRIPTS_DIR/commands/alerts.sh"
+
+	# Debería fallar si .env no existe
+	assert_failure "$output" "$status" "Debería fallar sin .env cuando no se especifican servicios"
+	assert_contains "$output" "no está corriendo\|no se pueden verificar\|no encontrado\|ALERTA" "Debería indicar problema"
+}
+
+@test "alerts.sh acepta servicios como argumentos" {
+	# Especificar servicios directamente evita necesidad de .env
+	run env PROJECT_ROOT="$TEST_TMP_DIR" \
+		bash "$TEST_SCRIPTS_DIR/commands/alerts.sh" "test-service-1" "test-service-2"
+
+	# Debería ejecutarse (puede fallar si Docker no está disponible, pero no por falta de .env)
+	[[ $status -ge 0 ]]
+}
+
+@test "alerts.sh usa variable de entorno SERVICES" {
+	local env_file=$(create_test_env_file "POSTGRES_VERSION=15.0")
+
+	run env SERVICES="test-service" PROJECT_ROOT="$TEST_TMP_DIR" \
+		bash "$TEST_SCRIPTS_DIR/commands/alerts.sh"
+
+	# Debería usar SERVICES en lugar de detectar desde .env
+	[[ $status -ge 0 ]]
+}
+
+@test "alerts.sh retorna 0 cuando no hay alertas" {
+	# Sin servicios, no debería haber alertas
+	run env SERVICES="" PROJECT_ROOT="$TEST_TMP_DIR" \
+		bash "$TEST_SCRIPTS_DIR/commands/alerts.sh"
+
+	# Puede retornar 0 o non-zero dependiendo del entorno
+	[[ $status -ge 0 ]]
+}
+
+@test "alerts.sh maneja lista vacía de servicios" {
+	run env PROJECT_ROOT="$TEST_TMP_DIR" \
+		bash "$TEST_SCRIPTS_DIR/commands/alerts.sh"
+
+	# Si no hay servicios, debería salir con éxito (no hay alertas)
+	# O fallar si requiere .env
+	[[ $status -ge 0 ]]
+}

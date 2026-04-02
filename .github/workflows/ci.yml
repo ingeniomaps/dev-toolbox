@@ -1,0 +1,247 @@
+name: CI - Verificación de Calidad
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality-check:
+    name: Verificación de Calidad de Código
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Verificar sintaxis de scripts
+        run: |
+          echo "Verificando sintaxis de scripts..."
+          find scripts/sh -name "*.sh" -type f | while read -r script; do
+            echo "Verificando: $script"
+            bash -n "$script" || exit 1
+          done
+          echo "✓ Todos los scripts tienen sintaxis válida"
+
+      - name: Verificar longitud de líneas
+        run: |
+          echo "Verificando longitud de líneas (≤ 120 caracteres)..."
+          LONG_LINES=$(find scripts/sh makefiles -type f \( -name "*.sh" -o -name "*.mk" \) \
+            -exec awk 'length > 120 {print FILENAME":"NR": "length" caracteres: "$0}' {} + || true)
+
+          if [[ -n "$LONG_LINES" ]]; then
+            echo "❌ Líneas que exceden 120 caracteres:"
+            echo "$LONG_LINES"
+            exit 1
+          fi
+          echo "✓ Todas las líneas cumplen con el límite de 120 caracteres"
+
+      - name: Instalar BATS
+        run: |
+          echo "Instalando BATS..."
+          if [[ -f "scripts/sh/setup/install-bats.sh" ]]; then
+            bash scripts/sh/setup/install-bats.sh || exit 1
+          else
+            echo "⚠️  Script install-bats.sh no encontrado, instalando BATS manualmente..."
+            git clone https://github.com/bats-core/bats-core.git .bats-tmp
+            cd .bats-tmp
+            ./install.sh ../.bats
+            cd ..
+            rm -rf .bats-tmp
+          fi
+          export PATH="$PWD/.bats/bin:$PATH"
+          bats --version
+          echo "✓ BATS instalado"
+
+      - name: Ejecutar tests unitarios
+        run: |
+          echo "Ejecutando tests unitarios..."
+          export PATH="$PWD/.bats/bin:$PATH"
+          if [[ -d "tests/unit" ]]; then
+            bats tests/unit/ || exit 1
+            echo "✓ Tests unitarios pasaron"
+          else
+            echo "⚠️  No hay tests unitarios en tests/unit/"
+          fi
+
+      - name: Ejecutar tests de integración
+        run: |
+          echo "Ejecutando tests de integración..."
+          export PATH="$PWD/.bats/bin:$PATH"
+          if [[ -d "tests/integration" ]]; then
+            # Verificar que Docker está disponible
+            if ! command -v docker >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; then
+              echo "⚠️  Docker no está disponible, saltando tests de integración"
+            else
+              bats tests/integration/ || exit 1
+              echo "✓ Tests de integración pasaron"
+            fi
+          else
+            echo "⚠️  No hay tests de integración en tests/integration/"
+          fi
+
+      - name: Ejecutar tests legacy de helpers
+        run: |
+          echo "Ejecutando tests legacy de helpers..."
+          if [[ -f "scripts/sh/tests/test-init.sh" ]]; then
+            bash scripts/sh/tests/test-init.sh || exit 1
+          fi
+
+          if [[ -f "scripts/sh/tests/test-services.sh" ]]; then
+            bash scripts/sh/tests/test-services.sh || exit 1
+          fi
+          echo "✓ Tests legacy de helpers pasaron"
+
+      - name: Instalar shellcheck y shfmt
+        run: |
+          echo "Instalando herramientas de linting..."
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            echo "Instalando shellcheck..."
+            sudo apt-get update && sudo apt-get install -y shellcheck
+          fi
+          export PATH="$HOME/go/bin:$PATH"
+          if ! command -v shfmt >/dev/null 2>&1; then
+            echo "Instalando shfmt..."
+            go install mvdan.cc/sh/v3/cmd/shfmt@latest || {
+              echo "⚠️  shfmt no se pudo instalar (requiere Go)"
+            }
+          fi
+          shellcheck --version || true
+          shfmt --version || true
+
+      - name: Ejecutar linters
+        run: |
+          export PATH="$HOME/go/bin:$PATH"
+          echo "Ejecutando linters..."
+          if [[ -f "scripts/sh/utils/lint.sh" ]]; then
+            bash scripts/sh/utils/lint.sh --check-only || {
+              echo "⚠️  Algunos problemas de linting encontrados"
+            }
+          else
+            echo "⚠️  Script lint.sh no encontrado"
+          fi
+
+      - name: Verificar calidad de código
+        run: |
+          echo "Ejecutando verificación de calidad..."
+          if [[ -f "scripts/sh/utils/check-code-quality.sh" ]]; then
+            bash scripts/sh/utils/check-code-quality.sh || {
+              echo "⚠️  Algunas verificaciones de calidad fallaron (no crítico)"
+            }
+          fi
+
+      - name: Verificar sintaxis de Makefiles
+        run: |
+          echo "Verificando sintaxis de Makefiles..."
+          make -n help-toolbox >/dev/null 2>&1 || {
+            echo "❌ Error en sintaxis de Makefiles"
+            exit 1
+          }
+          echo "✓ Makefiles tienen sintaxis válida"
+
+      - name: Verificar documentación de scripts
+        run: |
+          echo "Verificando documentación de scripts..."
+          if [[ -f "scripts/sh/utils/check-documentation.sh" ]]; then
+            bash scripts/sh/utils/check-documentation.sh || {
+              echo "⚠️  Algunos scripts tienen documentación incompleta"
+            }
+          else
+            echo "⚠️  Script check-documentation.sh no encontrado"
+          fi
+
+      - name: Resumen
+        run: |
+          echo "=========================================="
+          echo "✓ Verificación de calidad completada"
+          echo "=========================================="
+
+  validate-config:
+    name: Validación de Configuración
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Verificar que .env-template existe
+        run: |
+          if [[ ! -f ".env-template" ]]; then
+            echo "⚠️  .env-template no encontrado (puede ser opcional)"
+          else
+            echo "✓ .env-template encontrado"
+          fi
+
+      - name: Verificar estructura de directorios
+        run: |
+          echo "Verificando estructura de directorios..."
+          REQUIRED_DIRS=(
+            "scripts/sh/common"
+            "scripts/sh/commands"
+            "scripts/sh/utils"
+            "makefiles/main"
+          )
+
+          for dir in "${REQUIRED_DIRS[@]}"; do
+            if [[ ! -d "$dir" ]]; then
+              echo "❌ Directorio requerido no encontrado: $dir"
+              exit 1
+            fi
+          done
+          echo "✓ Estructura de directorios correcta"
+
+  compatibility-tests:
+    name: Tests de Compatibilidad
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Bash
+        run: |
+          echo "BASH_VERSION=$(bash --version | head -n1)" >> $GITHUB_ENV
+          bash --version
+
+      - name: Instalar BATS
+        run: |
+          echo "Instalando BATS..."
+          if [[ -f "scripts/sh/setup/install-bats.sh" ]]; then
+            bash scripts/sh/setup/install-bats.sh || exit 1
+          else
+            git clone https://github.com/bats-core/bats-core.git .bats-tmp
+            cd .bats-tmp
+            ./install.sh ../.bats
+            cd ..
+            rm -rf .bats-tmp
+          fi
+          export PATH="$PWD/.bats/bin:$PATH"
+          bats --version
+
+      - name: Ejecutar tests de compatibilidad OS
+        run: |
+          export PATH="$PWD/.bats/bin:$PATH"
+          if [[ -f "tests/integration/test-compatibility-os.bats" ]]; then
+            bats tests/integration/test-compatibility-os.bats || true
+          fi
+
+      - name: Ejecutar tests de compatibilidad Bash
+        run: |
+          export PATH="$PWD/.bats/bin:$PATH"
+          if [[ -f "tests/integration/test-compatibility-bash.bats" ]]; then
+            bats tests/integration/test-compatibility-bash.bats || true
+          fi
+
+      - name: Ejecutar tests de compatibilidad Docker Compose
+        if: runner.os == 'Linux'
+        run: |
+          export PATH="$PWD/.bats/bin:$PATH"
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "Docker no está disponible en este runner"
+          elif [[ -f "tests/integration/test-compatibility-docker-compose.bats" ]]; then
+            bats tests/integration/test-compatibility-docker-compose.bats || true
+          fi

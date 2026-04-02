@@ -1,0 +1,157 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_part:
+        description: 'Parte a incrementar (patch, minor, major)'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      skip_tests:
+        description: 'Saltar tests'
+        required: false
+        type: boolean
+        default: false
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Crear Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Instalar BATS
+        if: ${{ !inputs.skip_tests }}
+        run: |
+          echo "Instalando BATS..."
+          if [[ -f "scripts/sh/setup/install-bats.sh" ]]; then
+            bash scripts/sh/setup/install-bats.sh || exit 1
+          else
+            git clone https://github.com/bats-core/bats-core.git .bats-tmp
+            cd .bats-tmp
+            ./install.sh ../.bats
+            cd ..
+            rm -rf .bats-tmp
+          fi
+          export PATH="$PWD/.bats/bin:$PATH"
+          bats --version
+
+      - name: Ejecutar tests
+        if: ${{ !inputs.skip_tests }}
+        run: |
+          echo "Ejecutando tests..."
+          export PATH="$PWD/.bats/bin:$PATH"
+
+          # Tests unitarios
+          if [[ -d "tests/unit" ]]; then
+            bats tests/unit/ || exit 1
+          fi
+
+          # Tests de integración (solo si Docker está disponible)
+          if [[ -d "tests/integration" ]] && command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+            bats tests/integration/ || exit 1
+          fi
+
+          # Tests legacy
+          for test in scripts/sh/tests/test-*.sh; do
+            if [[ -f "$test" ]]; then
+              bash "$test" || exit 1
+            fi
+          done
+
+      - name: Ejecutar release
+        env:
+          SKIP_TESTS: ${{ inputs.skip_tests }}
+        run: |
+          make release PART=${{ github.event.inputs.version_part }} || exit 1
+
+      - name: Obtener versión
+        id: version
+        run: |
+          VERSION=$(cat .version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Versión: $VERSION"
+
+      - name: Publicar tag y commits
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          git push origin "v${VERSION}" || echo "Tag ya existe en remoto"
+          git push origin main || git push origin master
+
+      - name: Crear GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          files: |
+            RELEASE_NOTES_*.md
+          body_path: RELEASE_NOTES_${{ steps.version.outputs.version }}.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release:
+    name: Publicar Release desde Tag
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Extraer versión del tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Versión del tag: $VERSION"
+
+      - name: Generar release notes desde CHANGELOG
+        id: release_notes
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          if [[ -f "CHANGELOG.md" ]]; then
+            awk "/^## \[${VERSION}\]/,/^## \[/" CHANGELOG.md | \
+              head -n -1 | \
+              sed '/^---$/d' > RELEASE_NOTES.md
+            echo "Release notes generadas"
+          else
+            echo "# Release v${VERSION}" > RELEASE_NOTES.md
+            echo "" >> RELEASE_NOTES.md
+            echo "Release automático desde tag v${VERSION}" >> RELEASE_NOTES.md
+            echo "Release notes generadas (placeholder)"
+          fi
+
+      - name: Crear GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+            RELEASE_NOTES.md
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,23 @@
+# ShellCheck Configuration
+# ============================================================================
+# Configuración de ShellCheck para el proyecto dev-toolbox
+# ============================================================================
+
+# Shell por defecto
+shell=bash
+
+# Seguir fuentes externas (source ./file.sh)
+# Elimina falsos positivos SC1091 en scripts que hacen source relativo
+external-sources=true
+
+# Rutas donde buscar scripts referenciados con source
+source-path=scripts/sh/common
+source-path=scripts/sh/utils
+source-path=scripts/sh/commands
+
+# Excluir warnings aceptables en este proyecto:
+# SC1090: Can't follow non-constant source (carga dinámica)
+# SC1091: Not following: file not specified as input (residual con external-sources)
+# SC2016: Single-quoted expressions don't expand (intentional in sed patterns)
+# SC2317: Command appears unreachable (false positive for else-branch fallbacks and trap handlers)
+disable=SC1090,SC1091,SC2016,SC2317

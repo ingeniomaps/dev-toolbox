@@ -1,0 +1,38 @@
+# shfmt Configuration
+# ============================================================================
+# Configuración de shfmt para formateo consistente de scripts Bash
+# ============================================================================
+
+# Indentación: usar tabs (0) o espacios (número)
+# Usamos 2 espacios para consistencia con el proyecto
+indent: 2
+
+# Ancho de línea binario (operadores binarios)
+# Usamos 120 para consistencia con el estándar del proyecto
+binary-next-line: false
+
+# Switch case indent
+switch-case-indent: false
+
+# Redirección indent
+redirect-indent: false
+
+# Espacio después de redirección
+space-redirects: false
+
+# Mantener espacios en línea vacía
+keep-padding: false
+
+# Funciones en una sola línea si es posible
+func-next-line: false
+
+# Simplificar código
+simplify: true
+
+# Usar tabs en lugar de espacios
+# false = usar espacios (2 espacios según indent)
+use-tabs: false
+
+# Ancho de línea
+# Usamos 120 para consistencia con el estándar del proyecto
+# (shfmt no tiene opción directa, pero respeta el límite si está configurado)

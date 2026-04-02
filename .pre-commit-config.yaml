@@ -1,0 +1,86 @@
+# Pre-commit hooks configuration
+# ============================================================================
+# Configuración de pre-commit hooks para dev-toolbox
+# ============================================================================
+#
+# Instalación:
+#   pip install pre-commit
+#   pre-commit install
+#
+# Uso:
+#   pre-commit run --all-files  # Ejecutar en todos los archivos
+#   pre-commit run               # Ejecutar solo en archivos staged
+# ============================================================================
+
+repos:
+  # Hooks generales
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.md$|\.mk$'
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # ShellCheck
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        args: ['--severity=warning', '--format=gcc']
+        exclude: '^tests/|^\.bats/'
+
+  # shfmt
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.12.0-2
+    hooks:
+      - id: shfmt
+        args: ['-i', '2', '-bn', '-ci', '-sr']
+        exclude: '^tests/|^\.bats/'
+
+  # Verificación de longitud de líneas
+  - repo: local
+    hooks:
+      - id: check-line-length
+        name: Check line length (≤ 120 chars)
+        entry: |
+          bash -c 'find scripts/sh makefiles -type f \( -name "*.sh" -o -name "*.mk" \) -exec awk "length > 120 {print FILENAME \":\" NR \": linea demasiado larga (\" length \" caracteres)\"; exit 1}" {} +'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  # Verificación de sintaxis Bash
+  - repo: local
+    hooks:
+      - id: check-bash-syntax
+        name: Check Bash syntax
+        entry: bash -c 'find scripts/sh -name "*.sh" -type f ! -path "*/tests/*" ! -path "*/.bats/*" -exec bash -n {} +'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  # Verificación de longitud máxima de archivos (500 líneas)
+  - repo: local
+    hooks:
+      - id: check-file-length
+        name: Check file length (≤ 500 lines)
+        entry: |
+          bash -c 'failed=0;
+          while IFS= read -r file; do
+            lines=$(wc -l < "$file" | tr -d " ");
+            if [ "$lines" -gt 500 ]; then
+              echo "ERROR: $file tiene $lines líneas (máximo permitido: 500)";
+              failed=1;
+            fi;
+          done < <(find scripts -type f \( -name "*.sh" -o -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.mk" \) ! -path "*/tests/*" ! -path "*/.bats/*");
+          if [ "$failed" -eq 1 ]; then exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
